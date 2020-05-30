@@ -9,31 +9,23 @@ import java.util.concurrent.Executors;
 
 import app.AppConfig;
 import app.Cancellable;
-import servent.handler.AskGetHandler;
-import servent.handler.MessageHandler;
-import servent.handler.NewNodeHandler;
-import servent.handler.NullHandler;
-import servent.handler.PutHandler;
-import servent.handler.SorryHandler;
-import servent.handler.TellGetHandler;
-import servent.handler.UpdateHandler;
-import servent.handler.WelcomeHandler;
+import servent.handler.*;
 import servent.message.Message;
 import servent.message.util.MessageUtil;
 
 public class SimpleServentListener implements Runnable, Cancellable {
 
 	private volatile boolean working = true;
-	
+
 	public SimpleServentListener() {
-		
+
 	}
 
 	/*
 	 * Thread pool for executing the handlers. Each client will get it's own handler thread.
 	 */
 	private final ExecutorService threadPool = Executors.newWorkStealingPool();
-	
+
 	@Override
 	public void run() {
 		ServerSocket listenerSocket = null;
@@ -47,19 +39,19 @@ public class SimpleServentListener implements Runnable, Cancellable {
 			AppConfig.timestampedErrorPrint("Couldn't open listener socket on: " + AppConfig.myServentInfo.getListenerPort());
 			System.exit(0);
 		}
-		
-		
+
+
 		while (working) {
 			try {
 				Message clientMessage;
-				
+
 				Socket clientSocket = listenerSocket.accept();
-				
+
 				//GOT A MESSAGE! <3
 				clientMessage = MessageUtil.readMessage(clientSocket);
-				
+
 				MessageHandler messageHandler = new NullHandler(clientMessage);
-				
+
 				/*
 				 * Each message type has it's own handler.
 				 * If we can get away with stateless handlers, we will,
@@ -78,19 +70,13 @@ public class SimpleServentListener implements Runnable, Cancellable {
 				case UPDATE:
 					messageHandler = new UpdateHandler(clientMessage);
 					break;
-				case PUT:
-					messageHandler = new PutHandler(clientMessage);
-					break;
-				case ASK_GET:
-					messageHandler = new AskGetHandler(clientMessage);
-					break;
-				case TELL_GET:
-					messageHandler = new TellGetHandler(clientMessage);
+				case QUIT:
+					messageHandler = new QuitHandler(clientMessage);
 					break;
 				case POISON:
 					break;
 				}
-				
+
 				threadPool.submit(messageHandler);
 			} catch (SocketTimeoutException timeoutEx) {
 				//Uncomment the next line to see that we are waking up every second.

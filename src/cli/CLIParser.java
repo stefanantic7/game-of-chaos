@@ -6,20 +6,14 @@ import java.util.Scanner;
 
 import app.AppConfig;
 import app.Cancellable;
-import cli.command.CLICommand;
-import cli.command.DHTGetCommand;
-import cli.command.DHTPutCommand;
-import cli.command.InfoCommand;
-import cli.command.PauseCommand;
-import cli.command.StopCommand;
-import cli.command.SuccessorInfo;
+import cli.command.*;
 import servent.SimpleServentListener;
 
 /**
  * A simple CLI parser. Each command has a name and arbitrary arguments.
- * 
+ *
  * Currently supported commands:
- * 
+ *
  * <ul>
  * <li><code>info</code> - prints information about the current node</li>
  * <li><code>pause [ms]</code> - pauses exection given number of ms - useful when scripting</li>
@@ -29,36 +23,35 @@ import servent.SimpleServentListener;
  * <li><code>print_causal</code> - prints all received causal broadcast messages</li>
  * <li><code>stop</code> - stops the servent and program finishes</li>
  * </ul>
- * 
+ *
  * @author bmilojkovic
  *
  */
 public class CLIParser implements Runnable, Cancellable {
 
 	private volatile boolean working = true;
-	
+
 	private final List<CLICommand> commandList;
-	
+
 	public CLIParser(SimpleServentListener listener) {
 		this.commandList = new ArrayList<>();
-		
+
 		commandList.add(new InfoCommand());
 		commandList.add(new PauseCommand());
 		commandList.add(new SuccessorInfo());
-		commandList.add(new DHTGetCommand());
-		commandList.add(new DHTPutCommand());
+		commandList.add(new QuitCommand(this, listener));
 		commandList.add(new StopCommand(this, listener));
 	}
-	
+
 	@Override
 	public void run() {
 		Scanner sc = new Scanner(System.in);
-		
+
 		while (working) {
 			String commandLine = sc.nextLine();
-			
+
 			int spacePos = commandLine.indexOf(" ");
-			
+
 			String commandName = null;
 			String commandArgs = null;
 			if (spacePos != -1) {
@@ -67,9 +60,9 @@ public class CLIParser implements Runnable, Cancellable {
 			} else {
 				commandName = commandLine;
 			}
-			
+
 			boolean found = false;
-			
+
 			for (CLICommand cliCommand : commandList) {
 				if (cliCommand.commandName().equals(commandName)) {
 					cliCommand.execute(commandArgs);
@@ -77,18 +70,18 @@ public class CLIParser implements Runnable, Cancellable {
 					break;
 				}
 			}
-			
+
 			if (!found) {
 				AppConfig.timestampedErrorPrint("Unknown command: " + commandName);
 			}
 		}
-		
+
 		sc.close();
 	}
-	
+
 	@Override
 	public void stop() {
 		this.working = false;
-		
+
 	}
 }
