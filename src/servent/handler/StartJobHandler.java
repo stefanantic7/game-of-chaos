@@ -1,0 +1,98 @@
+package servent.handler;
+
+import app.*;
+import servent.message.Message;
+import servent.message.MessageType;
+import servent.message.StartJobMessage;
+import servent.message.util.MessageUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class StartJobHandler implements MessageHandler {
+
+    private Message clientMessage;
+
+    public StartJobHandler(Message clientMessage) {
+        this.clientMessage = clientMessage;
+    }
+
+
+    @Override
+    public void run() {
+        try {
+            this.handle();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private void handle() {
+        if (clientMessage.getMessageType() != MessageType.START_JOB) {
+            AppConfig.timestampedErrorPrint("Job execution handler got a message that is not START_JOB");
+            return;
+        }
+
+        StartJobMessage startJobMessage = (StartJobMessage) clientMessage;
+
+        List<String> fractalIds = startJobMessage.getFractalIds();
+        List<Point> pointList = startJobMessage.getInitialPoints();
+        AppConfig.timestampedStandardPrint("Fractal ids: " + fractalIds.toString());
+        AppConfig.timestampedStandardPrint("Starting points: " + pointList.toString());
+
+        AppConfig.chordState.setFractalIdToNodeIdMap(startJobMessage.getFractalIdToNodeIdMap());
+
+        Job job = startJobMessage.getJob();
+        // no further splitting, job execution can start
+        if (fractalIds.size() == 1) {
+            JobRunner jobRunner = new JobRunner(job.getName(), fractalIds.get(0), job.getProportion(),
+                    job.getWidth(), job.getHeight(), pointList);
+            AppConfig.chordState.setJobRunner(jobRunner);
+            Thread t = new Thread(jobRunner);
+            t.start();
+            return;
+        }
+
+        // split + send to others
+        int level = startJobMessage.getLevel() + 1;
+        int initialPointsCount = job.getInitialPointsCount();
+        double proportion = job.getProportion();
+
+        for (int i = 0; i < initialPointsCount; i++) {
+            List<Point> regionPoints = new ArrayList<>();
+
+            Point startPoint = pointList.get(i);
+            for (int j = 0; j < pointList.size(); j++) {
+                if (i == j) {
+                    regionPoints.add(startPoint);
+                    continue;
+                }
+
+                Point other = pointList.get(j);
+                int newX = (int) (startPoint.getX() + proportion * (other.getX() - startPoint.getX()));
+                int newY = (int) (startPoint.getY() + proportion * (other.getY() - startPoint.getY()));
+                Point newPoint = new Point(newX, newY);
+
+                regionPoints.add(newPoint);
+            }
+
+            List<String> partialFractalIds = new ArrayList<>();
+            for (String fractal: fractalIds) {
+                if (fractal.charAt(level) - '0' == i) {
+                    partialFractalIds.add(fractal);
+                }
+            }
+
+            // todo: FIX THIS ASAP - send over successor table
+            int executorId = AppConfig.chordState.getFractalIdToNodeIdMap().get(partialFractalIds.get(0));
+            ServentInfo executorServent = AppConfig.chordState.getAllNodeInfo().get(executorId);
+            // send to one node partialFractalIds, regionPoints and job
+            StartJobMessage newStartJobMessage = new StartJobMessage(
+                    AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
+                    executorServent.getIpAddress(), executorServent.getListenerPort(),
+                    partialFractalIds, regionPoints, job, level, AppConfig.chordState.getFractalIdToNodeIdMap());
+            MessageUtil.sendMessage(newStartJobMessage);
+        }
+
+    }
+}

@@ -30,10 +30,12 @@ public class QuitCommand implements CLICommand {
         AppConfig.timestampedStandardPrint("Please wait, stopping...");
 
         // 1. Update first neighbour and start chain reaction :)
-        QuitMessage quitMessage = new QuitMessage(AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
-                AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
-                AppConfig.myServentInfo.getId());
-        MessageUtil.sendMessage(quitMessage);
+        if (AppConfig.chordState.hasNextNode()) {
+            QuitMessage quitMessage = new QuitMessage(AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
+                    AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
+                    AppConfig.myServentInfo.getId());
+            MessageUtil.sendMessage(quitMessage);
+        }
 
         // 2. Notify bootstrap server
         try {

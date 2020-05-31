@@ -1,4 +1,33 @@
-11:53:18 - Bootstrap server started on port: 2000
+00:23:30 - Bootstrap server started on port: 2000
+Got: 1100
+Got: 1200
+Adding: localhost:1200
+00:24:38 - Removing: localhost:1100
+00:24:41 - Removing: localhost:1200
+Got: 1100
+Got: 1200
+Adding: localhost:1200
+Got: 1300
+Adding: localhost:1300
+00:31:51 - Removing: localhost:1300
+00:31:55 - Removing: localhost:1200
+00:32:00 - Removing: localhost:1100
+Got: 1100
+Got: 1200
+Adding: localhost:1200
+Got: 1300
+Adding: localhost:1300
+00:35:37 - Removing: localhost:1300
+00:35:42 - Removing: localhost:1200
+00:35:47 - Removing: localhost:1100
+Got: 1100
+Got: 1200
+Adding: localhost:1200
+Got: 1300
+Adding: localhost:1300
+00:39:07 - Removing: localhost:1300
+00:39:13 - Removing: localhost:1200
+00:39:18 - Removing: localhost:1100
 Got: 1100
 Got: 1200
 Adding: localhost:1200
@@ -6,6 +35,15 @@ Got: 1300
 Adding: localhost:1300
 Got: 1400
 Adding: localhost:1400
-11:54:33 - Removing: localhost:1300
-11:54:47 - Removing: localhost:1100
-11:54:59 - Removing: localhost:1400
+Got: 1500
+Adding: localhost:1500
+00:42:56 - Removing: localhost:1100
+00:43:04 - Removing: localhost:1200
+00:43:16 - Removing: localhost:1300
+00:43:25 - Removing: localhost:1400
+00:43:32 - Removing: localhost:1500
+Got: 1100
+Got: 1200
+Adding: localhost:1200
+Got: 1300
+Adding: localhost:1300

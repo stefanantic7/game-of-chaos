@@ -3,15 +3,10 @@ package app;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import servent.message.WelcomeMessage;
-import servent.message.util.MessageUtil;
 
 /**
  * This class implements all the logic required for Chord to function.
@@ -45,10 +40,16 @@ public class ChordState {
 	//we DO NOT use this to send messages, but only to construct the successor table
 	private Map<Integer, ServentInfo> allNodeInfo;
 
+	private Map<String, Integer> fractalIdToNodeIdMap;
+
+	private JobRunner jobRunner;
+
 	public ChordState() {
 		allNodeInfo = new HashMap<>();
 
 		this.calculateChordLevel();
+
+		this.fractalIdToNodeIdMap = new HashMap<>();
 	}
 
 	/**
@@ -83,6 +84,10 @@ public class ChordState {
 		return successorTable;
 	}
 
+	public boolean hasNextNode() {
+		return successorTable.length > 0 && successorTable[0] != null;
+	}
+
 	public int getNextNodePort() {
 		return successorTable[0].getListenerPort();
 	}
@@ -112,7 +117,7 @@ public class ChordState {
 		ServentInfo firstSuccessor = null;
 		if (allNodeInfo.get(firstSuccessorIndex) != null) {
 			firstSuccessor = allNodeInfo.get(firstSuccessorIndex);
-		} else {
+		} else if (allNodeInfo.size() > 1){
 			firstSuccessor = allNodeInfo.get(0);
 		}
 		successorTable[0] = firstSuccessor;
@@ -135,5 +140,34 @@ public class ChordState {
 	public void mergeNodesInfoAndUpdateSuccessors(Map<Integer, ServentInfo> newNodesInfo) {
 		newNodesInfo.forEach((key, value) -> allNodeInfo.put(key, value));
 		updateSuccessorTable();
+	}
+
+	public Integer getIdForFractalId(String fractalId) {
+		System.out.println(this.fractalIdToNodeIdMap);
+		return this.fractalIdToNodeIdMap.get(fractalId);
+	}
+
+	public Map<String, Integer> getFractalIdToNodeIdMap() {
+		return fractalIdToNodeIdMap;
+	}
+
+	public void setFractalIdToNodeIdMap(Map<String, Integer> fractalIdToNodeIdMap) {
+		this.fractalIdToNodeIdMap = fractalIdToNodeIdMap;
+	}
+
+	public void clearFractalIdToNodeId() {
+		this.fractalIdToNodeIdMap = new HashMap<>();
+	}
+
+	public void registerFractalId(String fractalId, int nodeId) {
+		this.fractalIdToNodeIdMap.put(fractalId, nodeId);
+	}
+
+	public void setJobRunner(JobRunner jobRunner) {
+		this.jobRunner = jobRunner;
+	}
+
+	public JobRunner getJobRunner() {
+		return jobRunner;
 	}
 }

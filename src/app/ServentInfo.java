@@ -3,6 +3,7 @@ package app;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This is an immutable class that holds all the information for a servent.
@@ -45,9 +46,29 @@ public class ServentInfo implements Serializable {
 		this.jobs.add(job);
 	}
 
+	public Job getFirstJob() {
+		if (this.jobs.size() == 0) {
+			return null;
+		}
+		return this.jobs.get(0);
+	}
+
 	@Override
 	public String toString() {
 		return "[" + id + "|" + ipAddress + "|" + listenerPort + "]";
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		ServentInfo that = (ServentInfo) o;
+		return listenerPort == that.listenerPort &&
+				Objects.equals(ipAddress, that.ipAddress);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(ipAddress, listenerPort);
+	}
 }
