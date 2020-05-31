@@ -59,7 +59,7 @@ public class BasicMessage implements Message {
 	}
 
 	@Override
-	public String getReceiverIpAddress() {
+	public String getReceiverIp() {
 		return "localhost";
 	}
 
@@ -113,9 +113,9 @@ public class BasicMessage implements Message {
 	 */
 	@Override
 	public String toString() {
-		return "[" + ChordState.chordHash(getSenderPort()) + "|" + getSenderPort() + "|" + getMessageId() + "|" +
+		return "[" + getSenderIp() + "|" + getSenderPort() + "|" + getMessageId() + "|" +
 					getMessageText() + "|" + getMessageType() + "|" +
-					getReceiverPort() + "|" + ChordState.chordHash(getReceiverPort()) + "]";
+					getReceiverIp() + "|" + getReceiverPort() + "|" + "]";
 	}
 
 }

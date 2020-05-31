@@ -5,10 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class contains all the global application configuration stuff.
@@ -69,15 +67,7 @@ public class AppConfig {
 			System.exit(0);
 		}
 
-		try {
-			int chordSize = Integer.parseInt(properties.getProperty("chord_size"));
-
-			ChordState.CHORD_SIZE = chordSize;
-			chordState = new ChordState();
-		} catch (NumberFormatException e) {
-			timestampedErrorPrint("Problem reading chord_size. Must be a number that is a power of 2. Exiting...");
-			System.exit(0);
-		}
+		chordState = new ChordState();
 
 		myServentInfo = new ServentInfo(BOOTSTRAP_IP, BOOTSTRAP_PORT);
 	}
@@ -119,16 +109,7 @@ public class AppConfig {
 			System.exit(0);
 		}
 
-		try {
-			int chordSize = Integer.parseInt(properties.getProperty("chord_size"));
-
-			ChordState.CHORD_SIZE = chordSize;
-			chordState = new ChordState();
-
-		} catch (NumberFormatException e) {
-			timestampedErrorPrint("Problem reading chord_size. Must be a number that is a power of 2. Exiting...");
-			System.exit(0);
-		}
+		chordState = new ChordState();
 
 		try {
 			String ipAddress = properties.getProperty("ip");
@@ -136,40 +117,36 @@ public class AppConfig {
 
 			myServentInfo = new ServentInfo(ipAddress, listenerPort);
 		} catch (NumberFormatException e) {
-			timestampedErrorPrint("Problem reading ip_address or port. Exiting...");
+			timestampedErrorPrint("Problem reading ip_address and port. Exiting...");
 			System.exit(0);
 		}
 
 		String jobName = properties.getProperty("job_name");
-		if (jobName == null) {
-			return;
-		}
 
 		String[] pointsCoordinates = properties.getProperty("points.coordinates").split(";");
-		System.out.println(pointsCoordinates);
-//		List<Point> points = new ArrayList<>();
-//		try {
-//			for (String coordinates: pointsCoordinates) {
-//				String[] xy = coordinates.substring(1, coordinates.length() - 1).split(",");
-//				points.add(new Point(Integer.parseInt(xy[0]), Integer.parseInt(xy[1])));
-//			}
-//		} catch (NumberFormatException e) {
-//			timestampedErrorPrint("Problem reading points for the job. Exiting...");
-//			System.exit(0);
-//		}
-//
-//		try {
-//			int pointsCount = Integer.parseInt(properties.getProperty("points.count"));
-//			double proportion = Double.parseDouble(properties.getProperty("proportion"));
-//			int width = Integer.parseInt(properties.getProperty("width"));
-//			int height = Integer.parseInt(properties.getProperty("height"));
-//
-//			Job job = new Job(jobName, pointsCount, proportion, width, height, points);
-//			myServentInfo.addJob(job);
-//		} catch (NumberFormatException e) {
-//			timestampedErrorPrint("Problem reading integer or double properties for the job. Exiting...");
-//			System.exit(0);
-//		}
+
+		List<Point> points = new ArrayList<>();
+		try {
+			for (String coordinates: pointsCoordinates) {
+				String[] xy = coordinates.substring(1, coordinates.length() - 1).split(",");
+				points.add(new Point(Integer.parseInt(xy[0]), Integer.parseInt(xy[1])));
+			}
+		} catch (NumberFormatException e) {
+			timestampedErrorPrint("Problem reading points.coordinates. Exiting...");
+			System.exit(0);
+		}
+
+		try {
+			double proportion = Double.parseDouble(properties.getProperty("proportion"));
+			int width = Integer.parseInt(properties.getProperty("width"));
+			int height = Integer.parseInt(properties.getProperty("height"));
+
+			Job job = new Job(jobName, proportion, width, height, points);
+			myServentInfo.addJob(job);
+		} catch (NumberFormatException e) {
+			timestampedErrorPrint("Problem reading proportion, width or height. Exiting...");
+			System.exit(0);
+		}
 	}
 
 }

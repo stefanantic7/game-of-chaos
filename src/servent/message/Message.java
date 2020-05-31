@@ -38,7 +38,7 @@ public interface Message extends Serializable {
 	/**
 	 * IP address of the receiver.
 	 */
-	String getReceiverIpAddress();
+	String getReceiverIp();
 
 	/**
 	 * Message type. Mainly used to decide which handler will work on this message.

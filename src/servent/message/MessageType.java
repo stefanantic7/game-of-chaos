@@ -1,5 +1,5 @@
 package servent.message;
 
 public enum MessageType {
-	NEW_NODE, WELCOME, SORRY, UPDATE, QUIT, POISON
+	NEW_NODE, WELCOME, UPDATE, QUIT, POISON
 }

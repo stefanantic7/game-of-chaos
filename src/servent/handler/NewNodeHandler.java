@@ -10,7 +10,6 @@ import app.ServentInfo;
 import servent.message.Message;
 import servent.message.MessageType;
 import servent.message.NewNodeMessage;
-import servent.message.SorryMessage;
 import servent.message.WelcomeMessage;
 import servent.message.util.MessageUtil;
 
@@ -45,14 +44,17 @@ public class NewNodeHandler implements MessageHandler {
 		if (AppConfig.chordState.getSuccessorTable()[0] != null) {
 			firstServent = AppConfig.chordState.getSuccessorTable()[0];
 		}
+
 		String firstServentIp = firstServent.getIpAddress();
 		int firstServentPort = firstServent.getListenerPort();
 		String firstServentIpAndPort = firstServentIp + ":" + firstServentPort;
 
-		int hisId = AppConfig.myServentInfo.getId() + 1;
+		int newNodeId = AppConfig.myServentInfo.getId() + 1;
 
-		WelcomeMessage wm = new WelcomeMessage(AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
-				newNodeIpAddress, newNodePort, hisId, firstServentIpAndPort);
+		WelcomeMessage wm = new WelcomeMessage(
+				AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
+				newNodeIpAddress, newNodePort,
+				newNodeId, firstServentIpAndPort);
 		MessageUtil.sendMessage(wm);
 	}
 

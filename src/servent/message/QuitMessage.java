@@ -2,9 +2,9 @@ package servent.message;
 
 public class QuitMessage extends BasicMessage {
 
-    private static final long serialVersionUID = 2276991847916324467L;
+    private static final long serialVersionUID = 549279197594251394L;
 
-    private int quitterId;
+    private final int quitterId;
 
     public QuitMessage(String senderIp, int senderPort,
                        String receiverIp, int receiverPort,

@@ -77,12 +77,11 @@ public class BootstrapServer {
 					String newServentIp = newServentIpAndPort[0];
 					int newServentPort = Integer.parseInt(newServentIpAndPort[1]);
 
-					System.out.println("got " + newServentPort);
+					System.out.println("Got: " + newServentPort);
 					PrintWriter socketWriter = new PrintWriter(newServentSocket.getOutputStream());
 
 					if (activeServents.size() == 0) {
-						socketWriter.write(":-1" + "\n"); // First servent but fake :)
-						socketWriter.write(":-1" + "\n"); // Last servent but fake :)
+						socketWriter.write(":-1" + "\n"); // -1 to indicate that server is first :)
 
 						ServentEntity serventEntity = new ServentEntity(newServentIp, newServentPort);
 						activeServents.add(serventEntity); //first one doesn't need to confirm
@@ -90,11 +89,7 @@ public class BootstrapServer {
 						String lastServentIp = activeServents.get(activeServents.size() - 1).getIp();
 						int lastServentPort = activeServents.get(activeServents.size() - 1).getPort();
 
-						String firstServentIp = activeServents.get(0).getIp();
-						int firstServentPort = activeServents.get(0).getPort();
-
 						socketWriter.write(lastServentIp + ":" + lastServentPort + "\n");
-						socketWriter.write(firstServentIp + ":" + firstServentPort + "\n");
 					}
 
 					socketWriter.flush();
@@ -105,13 +100,20 @@ public class BootstrapServer {
 					 */
 					String newServentIpAndPort = socketScanner.nextLine();
 
-					System.out.println("adding " + newServentIpAndPort);
+					System.out.println("Adding: " + newServentIpAndPort);
 
 					activeServents.add(new ServentEntity(newServentIpAndPort));
 					newServentSocket.close();
+				} else if (message.equals("Quit")) {
+					String serventIpAndPort = socketScanner.nextLine();
+
+					AppConfig.timestampedStandardPrint("Removing: " + serventIpAndPort);
+
+					activeServents.remove(new ServentEntity(serventIpAndPort));
+					newServentSocket.close();
 				}
 
-			} catch (SocketTimeoutException e) {
+			} catch (SocketTimeoutException ignored) {
 
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -1,8 +1,6 @@
 package servent.handler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import app.AppConfig;
@@ -36,15 +34,18 @@ public class UpdateHandler implements MessageHandler {
 		}
 
 		UpdateMessage updateMessage = (UpdateMessage) clientMessage;
-		Map<Integer, ServentInfo> allNodes = new HashMap<>(updateMessage.getNodesMap());
-		allNodes.put(AppConfig.myServentInfo.getId(), AppConfig.myServentInfo);
-		AppConfig.chordState.addNodes(allNodes);
 
-		if (!updateMessage.getSenderIp().equals(AppConfig.myServentInfo.getIpAddress())
-				|| updateMessage.getSenderPort() != AppConfig.myServentInfo.getListenerPort()) {
-			Message nextUpdate = new UpdateMessage(clientMessage.getSenderIp(), clientMessage.getSenderPort(),
+		Map<Integer, ServentInfo> allNodes = new HashMap<>(updateMessage.getNodesInfo());
+		allNodes.put(AppConfig.myServentInfo.getId(), AppConfig.myServentInfo);
+
+		AppConfig.chordState.mergeNodesInfoAndUpdateSuccessors(allNodes);
+
+		if (!clientMessage.getSenderIp().equals(AppConfig.myServentInfo.getIpAddress())
+				|| clientMessage.getSenderPort() != AppConfig.myServentInfo.getListenerPort()) {
+			Message nextUpdate = new UpdateMessage(
+					clientMessage.getSenderIp(), clientMessage.getSenderPort(),
 					AppConfig.chordState.getNextNodeIp(),  AppConfig.chordState.getNextNodePort(),
-					AppConfig.chordState.getAllNodeInfo(), "newMessageText");
+					AppConfig.chordState.getAllNodeInfo());
 			MessageUtil.sendMessage(nextUpdate);
 		}
 	}

@@ -27,17 +27,20 @@ public class QuitCommand implements CLICommand {
 
     @Override
     public void execute(String args) {
-        // inform successor so that it can delete you
+        AppConfig.timestampedStandardPrint("Please wait, stopping...");
+
+        // 1. Update first neighbour and start chain reaction :)
         QuitMessage quitMessage = new QuitMessage(AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                 AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
                 AppConfig.myServentInfo.getId());
         MessageUtil.sendMessage(quitMessage);
-        // send bootstrap server quit message - to remove us from active servents
+
+        // 2. Notify bootstrap server
         try {
             Socket bsSocket = new Socket(AppConfig.BOOTSTRAP_IP, AppConfig.BOOTSTRAP_PORT);
 
             PrintWriter bsWriter = new PrintWriter(bsSocket.getOutputStream());
-            bsWriter.write("Quit\n" + AppConfig.myServentInfo.getListenerPort() + "\n");
+            bsWriter.write("Quit\n" + AppConfig.myServentInfo.getIpAddress() + ":" + AppConfig.myServentInfo.getListenerPort() + "\n");
             bsWriter.flush();
 
             bsSocket.close();
@@ -45,7 +48,6 @@ public class QuitCommand implements CLICommand {
             e.printStackTrace();
         }
 
-        AppConfig.timestampedStandardPrint("Quitting...");
         parser.stop();
         listener.stop();
     }

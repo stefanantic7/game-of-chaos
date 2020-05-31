@@ -3,7 +3,6 @@ package app;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import servent.message.NewNodeMessage;
@@ -11,11 +10,11 @@ import servent.message.util.MessageUtil;
 
 public class ServentInitializer implements Runnable {
 
-	private ServentEntity[] getLastAndFirstServentEntities() {
+	private ServentEntity getLastServentEntity() {
 		String bsIp = AppConfig.BOOTSTRAP_IP;
 		int bsPort = AppConfig.BOOTSTRAP_PORT;
 
-		ServentEntity[] retVal = null;
+		ServentEntity retVal = null;
 
 		try {
 			Socket bsSocket = new Socket(bsIp, bsPort);
@@ -28,15 +27,11 @@ public class ServentInitializer implements Runnable {
 
 			Scanner bsScanner = new Scanner(bsSocket.getInputStream());
 			String lastServentIpAndPort = bsScanner.nextLine();
-			String firstServentIpAndPort = bsScanner.nextLine();
 			bsSocket.close();
 
 
-			ServentEntity[] lastAndFirstServentEntities = new ServentEntity[2];
-			lastAndFirstServentEntities[0] = new ServentEntity(lastServentIpAndPort);
-			lastAndFirstServentEntities[1] = new ServentEntity(firstServentIpAndPort);
+			retVal = new ServentEntity(lastServentIpAndPort);
 
-			retVal = lastAndFirstServentEntities;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -46,21 +41,19 @@ public class ServentInitializer implements Runnable {
 
 	@Override
 	public void run() {
-		ServentEntity[] lastAndFirstServentEntities = getLastAndFirstServentEntities();
+		ServentEntity lastServentEntity = getLastServentEntity();
 
-		if (lastAndFirstServentEntities == null) {
+		if (lastServentEntity == null) {
 			AppConfig.timestampedErrorPrint("Error in contacting bootstrap. Exiting...");
 			System.exit(0);
 		}
-		if (lastAndFirstServentEntities[0].getPort() == -1 && lastAndFirstServentEntities[1].getPort() == -1) { //bootstrap gave us -1 -> we are first
+		if (lastServentEntity.getPort() == -1) { //bootstrap gave us -1 -> we are first
 			AppConfig.myServentInfo.setId(0);
 			AppConfig.timestampedStandardPrint("First node in Chord system.");
 		} else { //bootstrap gave us something else - let that node tell our successor that we are here
-
-
 			NewNodeMessage nnm = new NewNodeMessage(
 					AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
-					lastAndFirstServentEntities[0].getIp(), lastAndFirstServentEntities[0].getPort());
+					lastServentEntity.getIp(), lastServentEntity.getPort());
 			MessageUtil.sendMessage(nnm);
 		}
 	}

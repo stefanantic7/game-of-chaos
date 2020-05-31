@@ -13,7 +13,7 @@ public class SuccessorInfo implements CLICommand {
 	@Override
 	public void execute(String args) {
 		ServentInfo[] successorTable = AppConfig.chordState.getSuccessorTable();
-		
+
 		int num = 0;
 		for (ServentInfo serventInfo : successorTable) {
 			System.out.println(num + ": " + serventInfo);

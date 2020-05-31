@@ -38,37 +38,17 @@ import servent.message.util.MessageUtil;
  */
 public class ChordState {
 
-	public static int CHORD_SIZE;
-	public static int chordHash(int value) {
-		return 61 * value % CHORD_SIZE;
-	}
-
 	private int chordLevel; //log_2(CHORD_SIZE)
 
 	private ServentInfo[] successorTable;
-	private ServentInfo predecessorInfo;
 
 	//we DO NOT use this to send messages, but only to construct the successor table
 	private Map<Integer, ServentInfo> allNodeInfo;
 
 	public ChordState() {
-		this.chordLevel = 1;
-		int tmp = CHORD_SIZE;
-		while (tmp != 2) {
-			if (tmp % 2 != 0) { //not a power of 2
-				throw new NumberFormatException();
-			}
-			tmp /= 2;
-			this.chordLevel++;
-		}
-
-		successorTable = new ServentInfo[chordLevel];
-		for (int i = 0; i < chordLevel; i++) {
-			successorTable[i] = null;
-		}
-
-		predecessorInfo = null;
 		allNodeInfo = new HashMap<>();
+
+		this.calculateChordLevel();
 	}
 
 	/**
@@ -77,8 +57,6 @@ public class ChordState {
 	 * It also lets bootstrap know that we did not collide.
 	 */
 	public void init(WelcomeMessage welcomeMsg) {
-		// set as predecessor the node who sent the message
-		predecessorInfo =  new ServentInfo(welcomeMsg.getSenderIp(), welcomeMsg.getSenderPort());
 		// set as first successor servent with id 0, for sending of update message
 		String firstServentIp = welcomeMsg.getFirstServentIpAndPort().split(":")[0];
 		int firstServentPort = Integer.parseInt(welcomeMsg.getFirstServentIpAndPort().split(":")[1]);
@@ -96,15 +74,9 @@ public class ChordState {
 
 			bsWriter.flush();
 			bsSocket.close();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public int getChordLevel() {
-		return chordLevel;
 	}
 
 	public ServentInfo[] getSuccessorTable() {
@@ -117,70 +89,6 @@ public class ChordState {
 
 	public String getNextNodeIp() {
 		return successorTable[0].getIpAddress();
-	}
-
-	public ServentInfo getPredecessor() {
-		return predecessorInfo;
-	}
-
-	public void setPredecessor(ServentInfo newNodeInfo) {
-		this.predecessorInfo = newNodeInfo;
-	}
-
-	/**
-	 * Returns true if we are the owner of the specified key.
-	 */
-	public boolean isKeyMine(int key) {
-		if (predecessorInfo == null) {
-			return true;
-		}
-
-		int predecessorChordId = predecessorInfo.getChordId();
-		int myChordId = AppConfig.myServentInfo.getChordId();
-
-		if (predecessorChordId < myChordId) { //no overflow
-			if (key <= myChordId && key > predecessorChordId) {
-				return true;
-			}
-		} else { //overflow
-			if (key <= myChordId || key > predecessorChordId) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Main chord operation - find the nearest node to hop to to find a specific key.
-	 * We have to take a value that is smaller than required to make sure we don't overshoot.
-	 * We can only be certain we have found the required node when it is our first next node.
-	 */
-	public ServentInfo getNextNodeForKey(int key) {
-		if (isKeyMine(key)) {
-			return AppConfig.myServentInfo;
-		}
-
-		int previousId = successorTable[0].getChordId();
-		for (int i = 1; i < successorTable.length; i++) {
-			if (successorTable[i] == null) {
-				AppConfig.timestampedErrorPrint("Couldn't find successor for " + key);
-				break;
-			}
-
-			int successorId = successorTable[i].getChordId();
-
-			if (successorId >= key) {
-				return successorTable[i-1];
-			}
-			if (key > previousId && successorId < previousId) { //overflow
-				return successorTable[i-1];
-			}
-			previousId = successorId;
-		}
-		//if we have only one node in all slots in the table, we might get here
-		//then we can return any item
-		return successorTable[0];
 	}
 
 	private void calculateChordLevel() {
@@ -198,10 +106,8 @@ public class ChordState {
 	}
 
 	private void updateSuccessorTable() {
-		//first node after me has to be successorTable[0]
-		AppConfig.timestampedStandardPrint(allNodeInfo.toString());
+		this.calculateChordLevel();
 
-		calculateChordLevel();
 		int firstSuccessorIndex = AppConfig.myServentInfo.getId() + 1;
 		ServentInfo firstSuccessor = null;
 		if (allNodeInfo.get(firstSuccessorIndex) != null) {
@@ -226,11 +132,8 @@ public class ChordState {
 		return allNodeInfo;
 	}
 
-	public void addNodes(Map<Integer, ServentInfo> newNodes) {
-		for (Map.Entry<Integer, ServentInfo> entry: newNodes.entrySet()) {
-			allNodeInfo.put(entry.getKey(), entry.getValue());
-		}
-
+	public void mergeNodesInfoAndUpdateSuccessors(Map<Integer, ServentInfo> newNodesInfo) {
+		newNodesInfo.forEach((key, value) -> allNodeInfo.put(key, value));
 		updateSuccessorTable();
 	}
 }

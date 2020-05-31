@@ -1,6 +1,8 @@
 package app;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is an immutable class that holds all the information for a servent.
@@ -13,12 +15,14 @@ public class ServentInfo implements Serializable {
 	private int id;
 	private final String ipAddress;
 	private final int listenerPort;
-	private final int chordId;
+
+	private final List<Job> jobs;
 
 	public ServentInfo(String ipAddress, int listenerPort) {
 		this.ipAddress = ipAddress;
 		this.listenerPort = listenerPort;
-		this.chordId = ChordState.chordHash(listenerPort);
+
+		this.jobs = new ArrayList<>();
 	}
 
 	public String getIpAddress() {
@@ -29,10 +33,6 @@ public class ServentInfo implements Serializable {
 		return listenerPort;
 	}
 
-	public int getChordId() {
-		return chordId;
-	}
-
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -41,9 +41,13 @@ public class ServentInfo implements Serializable {
 		return id;
 	}
 
+	public void addJob(Job job) {
+		this.jobs.add(job);
+	}
+
 	@Override
 	public String toString() {
-		return "[" + chordId + "|" + ipAddress + "|" + listenerPort + "]";
+		return "[" + id + "|" + ipAddress + "|" + listenerPort + "]";
 	}
 
 }
