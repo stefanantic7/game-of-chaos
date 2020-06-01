@@ -121,30 +121,28 @@ public class AppConfig {
 			System.exit(0);
 		}
 
-		String jobName = properties.getProperty("job_name");
-
-		String[] pointsCoordinates = properties.getProperty("points.coordinates").split(";");
-
-		List<Point> points = new ArrayList<>();
+		int jobCount = 0;
 		try {
-			for (String coordinates: pointsCoordinates) {
-				String[] xy = coordinates.substring(1, coordinates.length() - 1).split(",");
-				points.add(new Point(Integer.parseInt(xy[0]), Integer.parseInt(xy[1])));
+			jobCount = Integer.parseInt(properties.getProperty("job_count"));
+
+			for (int i=0; i < jobCount; i++) {
+				String name = properties.getProperty("job"+i+".name");
+				String[] pointsCoordinates = properties.getProperty("job"+i+".points.coordinates").split(";");
+				double proportion = Double.parseDouble(properties.getProperty("job"+i+".proportion"));
+				int width = Integer.parseInt(properties.getProperty("job"+i+".width"));
+				int height = Integer.parseInt(properties.getProperty("job"+i+".height"));
+
+				List<Point> points = new ArrayList<>();
+				for (String coordinates: pointsCoordinates) {
+					String[] xy = coordinates.substring(1, coordinates.length() - 1).split(",");
+					points.add(new Point(Integer.parseInt(xy[0]), Integer.parseInt(xy[1])));
+				}
+
+				Job job = new Job(name, proportion, width, height, points);
+				myServentInfo.addJob(job);
 			}
-		} catch (NumberFormatException e) {
-			timestampedErrorPrint("Problem reading points.coordinates. Exiting...");
-			System.exit(0);
-		}
-
-		try {
-			double proportion = Double.parseDouble(properties.getProperty("proportion"));
-			int width = Integer.parseInt(properties.getProperty("width"));
-			int height = Integer.parseInt(properties.getProperty("height"));
-
-			Job job = new Job(jobName, proportion, width, height, points);
-			myServentInfo.addJob(job);
-		} catch (NumberFormatException e) {
-			timestampedErrorPrint("Problem reading proportion, width or height. Exiting...");
+		} catch (NumberFormatException numberFormatException) {
+			timestampedErrorPrint("Problem reading jobs. Exiting...");
 			System.exit(0);
 		}
 	}

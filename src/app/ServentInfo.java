@@ -46,11 +46,16 @@ public class ServentInfo implements Serializable {
 		this.jobs.add(job);
 	}
 
-	public Job getFirstJob() {
-		if (this.jobs.size() == 0) {
-			return null;
+	public Job findJob(String jobName) {
+		Job found = null;
+		for (Job job: jobs) {
+			if (job.getName().equals(jobName)) {
+				found = job;
+				break;
+			}
 		}
-		return this.jobs.get(0);
+
+		return found;
 	}
 
 	@Override

@@ -67,7 +67,7 @@ public class CLIParser implements Runnable, Cancellable {
 
 			for (CLICommand cliCommand : commandList) {
 				if (cliCommand.commandName().equals(commandName)) {
-					cliCommand.execute(commandArgs);
+					cliCommand.execute(commandArgs, sc);
 					found = true;
 					break;
 				}

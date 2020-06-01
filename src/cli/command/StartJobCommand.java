@@ -12,16 +12,20 @@ import java.util.*;
 public class StartJobCommand implements CLICommand {
     @Override
     public String commandName() {
-        return "start-job";
+        return "start";
     }
 
     @Override
-    public void execute(String args) {
-        AppConfig.chordState.clearFractalIdToNodeId();
+    public void execute(String jobName, Scanner scanner) {
+        if (jobName == null || jobName.equals("")) {
+            Job newJob = this.createJobByUser(scanner);
+            jobName = newJob.getName();
+        }
+//        AppConfig.chordState.clearFractalIdToNodeId();
 
-        Job job = AppConfig.myServentInfo.getFirstJob();
+        Job job = AppConfig.myServentInfo.findJob(jobName);
         if (job == null) {
-            AppConfig.timestampedErrorPrint("Please provide job's configuration in properties file");
+            AppConfig.timestampedErrorPrint("Job \"" + jobName + "\" does not exists");
             return;
         }
 
@@ -104,6 +108,11 @@ public class StartJobCommand implements CLICommand {
         }
     }
 
+    @Override
+    public void execute(String args) {
+        throw new Error("Wrong method call");
+    }
+
     private int calculateNeededNodes(int serventCount, int pointsCount) {
         int i = 1;
 
@@ -159,5 +168,32 @@ public class StartJobCommand implements CLICommand {
         }
         Collections.sort(fractalIds);
         return fractalIds;
+    }
+
+    private Job createJobByUser(Scanner scanner) {
+        // validation + unique
+
+        System.out.println("Enter name of the job:");
+        String name = scanner.nextLine();
+        System.out.println("Enter coordinates (example: `(200,500);(500,200);(500,700)`):");
+        String[] pointsCoordinates = scanner.nextLine().split(";");
+        System.out.println("Enter proportion:");
+        double proportion = Double.parseDouble(scanner.nextLine());
+        System.out.println("Enter width:");
+        int width = Integer.parseInt(scanner.nextLine());
+        System.out.println("Enter height:");
+        int height = Integer.parseInt(scanner.nextLine());
+
+        List<Point> points = new ArrayList<>();
+        for (String coordinates: pointsCoordinates) {
+            String[] xy = coordinates.substring(1, coordinates.length() - 1).split(",");
+            points.add(new Point(Integer.parseInt(xy[0]), Integer.parseInt(xy[1])));
+        }
+
+        Job job = new Job(name, proportion, width, height, points);
+        AppConfig.myServentInfo.addJob(job);
+
+
+        return job;
     }
 }

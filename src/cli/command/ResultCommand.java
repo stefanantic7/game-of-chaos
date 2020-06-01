@@ -41,7 +41,8 @@ public class ResultCommand implements CLICommand {
             // todo: fix asap ne slati ovako
             AskForResultMessage askForResultMessage = new AskForResultMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
-                    firstServent.getIpAddress(), firstServent.getListenerPort());
+                    firstServent.getIpAddress(), firstServent.getListenerPort(),
+                    jobName);
             MessageUtil.sendMessage(askForResultMessage);
         }
         // get result for specific job and fractalId
@@ -55,7 +56,7 @@ public class ResultCommand implements CLICommand {
             // todo: fix sending
             AskForResultMessage askForResultMessage = new AskForResultMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
-                    executorServent.getIpAddress(), executorServent.getListenerPort(), fractalId);
+                    executorServent.getIpAddress(), executorServent.getListenerPort(), jobName, fractalId);
             MessageUtil.sendMessage(askForResultMessage);
         }
     }

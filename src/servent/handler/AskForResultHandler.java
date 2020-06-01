@@ -3,10 +3,7 @@ package servent.handler;
 import app.AppConfig;
 import app.JobDetails;
 import app.Point;
-import servent.message.AskForResultMessage;
-import servent.message.Message;
-import servent.message.MessageType;
-import servent.message.ResultMessage;
+import servent.message.*;
 import servent.message.util.MessageUtil;
 
 import java.util.Collections;
@@ -37,6 +34,12 @@ public class AskForResultHandler implements MessageHandler {
         }
 
         AskForResultMessage askForResultMessage = (AskForResultMessage) clientMessage;
+        if (AppConfig.chordState.getJobRunner() == null
+                || !AppConfig.chordState.getJobRunner().getJobName().equals(askForResultMessage.getJobName())) {
+            AppConfig.timestampedErrorPrint("The job \"" + askForResultMessage.getJobName() + "\" is not running");
+            return;
+        }
+
         int lastServentId = this.getLastActiveNodeId();
         Set<Point> receivedComputedPoints = askForResultMessage.getAppendedResults();
 
@@ -63,7 +66,7 @@ public class AskForResultHandler implements MessageHandler {
             AskForResultMessage newAskForResultMessage = new AskForResultMessage(
                     clientMessage.getSenderIp(), clientMessage.getSenderPort(),
                     AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
-                    receivedComputedPoints);
+                    askForResultMessage.getJobName(), receivedComputedPoints);
             MessageUtil.sendMessage(newAskForResultMessage);
         }
 

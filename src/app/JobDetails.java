@@ -1,6 +1,7 @@
 package app;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class JobDetails implements Serializable {
 
@@ -32,5 +33,21 @@ public class JobDetails implements Serializable {
 
     public int getHeight() {
         return height;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobDetails that = (JobDetails) o;
+        return Double.compare(that.proportion, proportion) == 0 &&
+                width == that.width &&
+                height == that.height &&
+                Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, proportion, width, height);
     }
 }
