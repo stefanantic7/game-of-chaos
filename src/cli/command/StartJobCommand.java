@@ -175,14 +175,48 @@ public class StartJobCommand implements CLICommand {
 
         System.out.println("Enter name of the job:");
         String name = scanner.nextLine();
+        while (AppConfig.myServentInfo.findJob(name) != null) {
+            AppConfig.timestampedErrorPrint("Job with this name already exists");
+            System.out.println("Enter name of the job:");
+            name = scanner.nextLine();
+        }
+
         System.out.println("Enter coordinates (example: `(200,500);(500,200);(500,700)`):");
-        String[] pointsCoordinates = scanner.nextLine().split(";");
-        System.out.println("Enter proportion:");
-        double proportion = Double.parseDouble(scanner.nextLine());
-        System.out.println("Enter width:");
-        int width = Integer.parseInt(scanner.nextLine());
-        System.out.println("Enter height:");
-        int height = Integer.parseInt(scanner.nextLine());
+        String[] pointsCoordinates = scanner.nextLine().split(";"); // TODO: validate with regex
+
+
+        double proportion = 0;
+        while (true) {
+            try {
+                System.out.println("Enter proportion:");
+                proportion = Double.parseDouble(scanner.nextLine());
+                break;
+            } catch (NumberFormatException numberFormatException) {
+                AppConfig.timestampedErrorPrint("Wrong number format, try again!");
+            }
+        }
+
+        int width = 0;
+        while (true) {
+            try {
+                System.out.println("Enter width:");
+                width = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException numberFormatException) {
+                AppConfig.timestampedErrorPrint("Wrong number format, try again!");
+            }
+        }
+
+        int height = 0;
+        while (true) {
+            try {
+                System.out.println("Enter height:");
+                height = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException numberFormatException) {
+                AppConfig.timestampedErrorPrint("Wrong number format, try again!");
+            }
+        }
 
         List<Point> points = new ArrayList<>();
         for (String coordinates: pointsCoordinates) {
@@ -192,7 +226,6 @@ public class StartJobCommand implements CLICommand {
 
         Job job = new Job(name, proportion, width, height, points);
         AppConfig.myServentInfo.addJob(job);
-
 
         return job;
     }
