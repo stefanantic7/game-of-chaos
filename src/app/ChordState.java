@@ -88,6 +88,14 @@ public class ChordState {
 		return successorTable.length > 0 && successorTable[0] != null;
 	}
 
+	public ServentInfo getNextNode() {
+		if (successorTable == null || successorTable.length == 0) {
+			return null;
+		}
+
+		return successorTable[0];
+	}
+
 	public int getNextNodePort() {
 		return successorTable[0].getListenerPort();
 	}

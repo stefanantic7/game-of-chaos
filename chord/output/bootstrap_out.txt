@@ -1,9 +1,21 @@
-19:09:56 - Bootstrap server started on port: 2000
+22:08:41 - Bootstrap server started on port: 2000
 Got: 1100
 Got: 1200
 Adding: localhost:1200
-19:12:13 - Removing: localhost:1200
-19:12:20 - Removing: localhost:1100
+Got: 1300
+Adding: localhost:1300
+Got: 1400
+Adding: localhost:1400
+Got: 1500
+Adding: localhost:1500
+Got: 1600
+Adding: localhost:1600
+22:24:22 - Removing: localhost:1600
+22:24:38 - Removing: localhost:1500
+22:24:45 - Removing: localhost:1400
+22:24:58 - Removing: localhost:1300
+22:25:08 - Removing: localhost:1200
+22:25:26 - Removing: localhost:1100
 Got: 1100
 Got: 1200
 Adding: localhost:1200

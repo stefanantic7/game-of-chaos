@@ -36,18 +36,16 @@ public class ResultCommand implements CLICommand {
         if (fractalId == null) {
             AppConfig.timestampedStandardPrint("Collecting computed points for job \"" + jobName + "\"...");
 
-            int firstServentId = this.getFirstActiveNodeId();
-            int lastServentId = this.getLastActiveNodeId();
-            ServentInfo firstServent = AppConfig.chordState.getAllNodeInfo().get(firstServentId);
+            ServentInfo firstServent = AppConfig.chordState.getAllNodeInfo().get(0);
 
             // todo: fix asap ne slati ovako
             AskForResultMessage askForResultMessage = new AskForResultMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     firstServent.getIpAddress(), firstServent.getListenerPort());
             MessageUtil.sendMessage(askForResultMessage);
-//        }
-//        // get result for specific job and fractalId
-//        else {
+        }
+        // get result for specific job and fractalId
+        else {
 //            int executorId = AppConfig.chordState.getIdForFractalIDAndJob(fractalId, jobName);
 //            ServentInfo executorServent = AppConfig.chordState.getAllNodeIdInfoMap().get(executorId);
 //            // todo: fix sending
@@ -59,17 +57,6 @@ public class ResultCommand implements CLICommand {
 //                    jobName);
 //            MessageUtil.sendMessage(message);
         }
-//
-//
-//        // todo: BUG - kad se trazi rez na istom cvoru koji je zapoceo posao, ne radi
-    }
-
-    private int getFirstActiveNodeId() {
-        return Collections.min(AppConfig.chordState.getFractalIdToNodeIdMap().values());
-    }
-
-    private int getLastActiveNodeId() {
-        return Collections.max(AppConfig.chordState.getFractalIdToNodeIdMap().values());
     }
 
 }
