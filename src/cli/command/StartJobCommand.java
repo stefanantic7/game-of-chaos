@@ -54,8 +54,9 @@ public class StartJobCommand implements CLICommand {
 
         if (jobNodesCount < pointsCount) {
             // only one node is executing the job
-            int executorId = AppConfig.myServentInfo.getId();
-            ServentInfo executorServent = AppConfig.myServentInfo;
+//            int executorId = AppConfig.myServentInfo.getId();
+//            ServentInfo executorServent = AppConfig.myServentInfo;
+            ServentInfo executorServent = AppConfig.chordState.getAllNodeInfo().get(0);
 
             StartJobMessage startJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),

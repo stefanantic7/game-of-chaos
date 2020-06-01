@@ -39,10 +39,10 @@ public class ResultHandler implements MessageHandler {
         ResultMessage resultMessage = (ResultMessage) clientMessage;
         Set<Point> resultPoints = resultMessage.getResultPoints();
 
-        String jobName = AppConfig.chordState.getJobRunner().getJobName();
-        int width = AppConfig.chordState.getJobRunner().getWidth();
-        int height = AppConfig.chordState.getJobRunner().getHeight();
-        double proportion = AppConfig.chordState.getJobRunner().getProportion();
+        String jobName = resultMessage.getJobDetails().getName();
+        int width = resultMessage.getJobDetails().getWidth();
+        int height = resultMessage.getJobDetails().getHeight();
+        double proportion = resultMessage.getJobDetails().getProportion();
 
 
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);

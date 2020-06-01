@@ -1,6 +1,7 @@
 package servent.handler;
 
 import app.AppConfig;
+import app.JobDetails;
 import app.Point;
 import servent.message.AskForResultMessage;
 import servent.message.Message;
@@ -39,21 +40,24 @@ public class AskForResultHandler implements MessageHandler {
         int lastServentId = this.getLastActiveNodeId();
         Set<Point> receivedComputedPoints = askForResultMessage.getAppendedResults();
 
+
         // add my points
         Set<Point> myComputedPoints = AppConfig.chordState.getJobRunner().getComputedPoints();
         AppConfig.timestampedStandardPrint("Points count: " + myComputedPoints.size());
         receivedComputedPoints.addAll(myComputedPoints);
         if (AppConfig.myServentInfo.getId() == lastServentId) {
             // send result to the node which requested it
-//            int width = AppConfig.chordState.getJobRunner().getWidth();
-//            int height = AppConfig.chordState.getJobRunner().getHeight();
-//            double proportion = AppConfig.chordState.getJobRunner().getProportion();
+            String name = AppConfig.chordState.getJobRunner().getJobName();
+            int width = AppConfig.chordState.getJobRunner().getWidth();
+            int height = AppConfig.chordState.getJobRunner().getHeight();
+            double proportion = AppConfig.chordState.getJobRunner().getProportion();
 
+            JobDetails jobDetails = new JobDetails(name, proportion, width, height);
             // todo: popravi slanje vise
             ResultMessage resultMessage = new ResultMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     clientMessage.getSenderIp(), clientMessage.getSenderPort(),
-                    receivedComputedPoints);
+                    jobDetails, receivedComputedPoints);
             MessageUtil.sendMessage(resultMessage);
         } else {
             // send to first successor
