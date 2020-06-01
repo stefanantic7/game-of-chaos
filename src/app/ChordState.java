@@ -151,7 +151,6 @@ public class ChordState {
 	}
 
 	public Integer getIdForFractalId(String fractalId) {
-		System.out.println(this.fractalIdToNodeIdMap);
 		return this.fractalIdToNodeIdMap.get(fractalId);
 	}
 

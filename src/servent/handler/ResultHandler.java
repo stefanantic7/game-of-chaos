@@ -52,13 +52,21 @@ public class ResultHandler implements MessageHandler {
         rgb[1] = 255;
         rgb[2] = 255;
         for (Point p : resultPoints) {
-            writableRaster.setPixel(p.getX(), p.getY(), rgb);
+            try {
+                writableRaster.setPixel(p.getX(), p.getY(), rgb);
+            } catch (ArrayIndexOutOfBoundsException exception) {
+                AppConfig.timestampedErrorPrint(exception.getMessage() + ": x=" + p.getX() + ", y=" + p.getY());
+            }
         }
         BufferedImage newImage = new BufferedImage(writableRaster.getWidth(), writableRaster.getHeight(),
                 BufferedImage.TYPE_3BYTE_BGR);
         newImage.setData(writableRaster);
         try {
-            ImageIO.write(newImage, "PNG", new File("fractals/" + jobName + "_" + proportion + ".png"));
+            String fileName = jobName + "_" + proportion;
+            if (resultMessage.hasFractalId()) {
+                fileName = fileName + "_" + resultMessage.getFractalId();
+            }
+            ImageIO.write(newImage, "PNG", new File("fractals/" + fileName + ".png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

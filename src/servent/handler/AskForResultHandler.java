@@ -40,12 +40,11 @@ public class AskForResultHandler implements MessageHandler {
         int lastServentId = this.getLastActiveNodeId();
         Set<Point> receivedComputedPoints = askForResultMessage.getAppendedResults();
 
-
         // add my points
         Set<Point> myComputedPoints = AppConfig.chordState.getJobRunner().getComputedPoints();
         AppConfig.timestampedStandardPrint("Points count: " + myComputedPoints.size());
         receivedComputedPoints.addAll(myComputedPoints);
-        if (AppConfig.myServentInfo.getId() == lastServentId) {
+        if (AppConfig.myServentInfo.getId() == lastServentId || askForResultMessage.hasFractalId()) {
             // send result to the node which requested it
             String name = AppConfig.chordState.getJobRunner().getJobName();
             int width = AppConfig.chordState.getJobRunner().getWidth();
@@ -57,7 +56,7 @@ public class AskForResultHandler implements MessageHandler {
             ResultMessage resultMessage = new ResultMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     clientMessage.getSenderIp(), clientMessage.getSenderPort(),
-                    jobDetails, receivedComputedPoints);
+                    jobDetails, receivedComputedPoints, askForResultMessage.getFractalId());
             MessageUtil.sendMessage(resultMessage);
         } else {
             // send to first successor

@@ -46,16 +46,17 @@ public class ResultCommand implements CLICommand {
         }
         // get result for specific job and fractalId
         else {
-//            int executorId = AppConfig.chordState.getIdForFractalIDAndJob(fractalId, jobName);
-//            ServentInfo executorServent = AppConfig.chordState.getAllNodeIdInfoMap().get(executorId);
-//            // todo: fix sending
-//            AskJobFractalIDResultMessage message = new AskJobFractalIDResultMessage(
-//                    AppConfig.myServentInfo.getListenerPort(),
-//                    executorServent.getListenerPort(),
-//                    AppConfig.myServentInfo.getIpAddress(),
-//                    executorServent.getIpAddress(),
-//                    jobName);
-//            MessageUtil.sendMessage(message);
+            Integer executorId = AppConfig.chordState.getIdForFractalId(fractalId);
+            if (executorId == null) {
+                AppConfig.timestampedErrorPrint("Fractal id " + fractalId + " does not exists");
+                return;
+            }
+            ServentInfo executorServent = AppConfig.chordState.getAllNodeInfo().get(executorId);
+            // todo: fix sending
+            AskForResultMessage askForResultMessage = new AskForResultMessage(
+                    AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
+                    executorServent.getIpAddress(), executorServent.getListenerPort(), fractalId);
+            MessageUtil.sendMessage(askForResultMessage);
         }
     }
 

@@ -11,11 +11,13 @@ public class ResultMessage extends BasicMessage {
 
     private final JobDetails jobDetails;
     private final Set<Point> resultPoints;
+    private final String fractalId;
 
-    public ResultMessage(String senderIp, int senderPort, String receiverIp, int receiverPort, JobDetails jobDetails, Set<Point> resultPoints) {
+    public ResultMessage(String senderIp, int senderPort, String receiverIp, int receiverPort, JobDetails jobDetails, Set<Point> resultPoints, String fractalId) {
         super(MessageType.RESULT, senderIp, senderPort, receiverIp, receiverPort);
         this.jobDetails = jobDetails;
         this.resultPoints = resultPoints;
+        this.fractalId = fractalId;
     }
 
     public Set<Point> getResultPoints() {
@@ -24,5 +26,13 @@ public class ResultMessage extends BasicMessage {
 
     public JobDetails getJobDetails() {
         return jobDetails;
+    }
+
+    public boolean hasFractalId() {
+        return this.fractalId != null && !this.fractalId.equals("");
+    }
+
+    public String getFractalId() {
+        return fractalId;
     }
 }
