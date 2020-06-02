@@ -36,6 +36,7 @@ public class AskForResultHandler implements MessageHandler {
         AskForResultMessage askForResultMessage = (AskForResultMessage) clientMessage;
         if (AppConfig.chordState.getJobRunner() == null
                 || !AppConfig.chordState.getJobRunner().getJobName().equals(askForResultMessage.getJobName())) {
+            // TODO: error message
             AppConfig.timestampedErrorPrint("The job \"" + askForResultMessage.getJobName() + "\" is not running");
             return;
         }

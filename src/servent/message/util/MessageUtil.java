@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 
 import app.AppConfig;
+import app.ServentInfo;
 import servent.message.Message;
 
 /**
@@ -55,5 +56,51 @@ public class MessageUtil {
 		Thread delayedSender = new Thread(new DelayedMessageSender(message));
 
 		delayedSender.start();
+	}
+
+	public ServentInfo getNextNodeForServentId(int receiverId) {
+		// if it is my successor send directly to it
+		if (isServentMySuccessor(receiverId)) {
+			return AppConfig.chordState.getAllNodeInfo().get(receiverId);
+		}
+		ServentInfo[] successorTable = AppConfig.chordState.getSuccessorTable();
+
+		int leftId = successorTable[0].getId();
+		for (int i = 1; i < successorTable.length; i++) {
+			int rightId = successorTable[i].getId();
+			if (isBetweenNodes(leftId, rightId, receiverId)) {
+				return successorTable[i-1];
+			}
+			leftId = rightId;
+		}
+
+		if (isBetweenNodes(leftId, successorTable[0].getId(), receiverId)) {
+			return successorTable[successorTable.length - 1];
+		}
+
+		return successorTable[0];
+	}
+
+	// returns true if we can send message directly to servent
+	private boolean isServentMySuccessor(int serventId) {
+		for (ServentInfo successor: AppConfig.chordState.getSuccessorTable()) {
+			if (successor.getId() == serventId) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isBetweenNodes(int left, int right, int target) {
+		int temp = target;
+		while (true) {
+			temp = (temp + 1) % AppConfig.chordState.getAllNodeInfo().size();
+			if (temp == left) {
+				return false;
+			}
+			if (temp == right) {
+				return true;
+			}
+		}
 	}
 }

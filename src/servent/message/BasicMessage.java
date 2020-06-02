@@ -60,7 +60,7 @@ public class BasicMessage implements Message {
 
 	@Override
 	public String getReceiverIp() {
-		return "localhost";
+		return this.receiverIp;
 	}
 
 	@Override

@@ -35,7 +35,8 @@ public class StopJobHandler implements MessageHandler {
         StopJobMessage stopJobMessage = (StopJobMessage) clientMessage;
 
         if (AppConfig.chordState.getJobRunner() == null
-                || !AppConfig.chordState.getJobRunner().getJobName().equals(((StopJobMessage) clientMessage).getJobName())) {
+                || !AppConfig.chordState.getJobRunner().getJobName().equals(stopJobMessage.getJobName())) {
+            // TODO: error message
             AppConfig.timestampedErrorPrint("The job \"" + stopJobMessage.getJobName() + "\" is not running");
             return;
         }
@@ -50,7 +51,7 @@ public class StopJobHandler implements MessageHandler {
 
         if (AppConfig.myServentInfo.getId() != lastActiveNodeId) {
             StopJobMessage message = new StopJobMessage(
-                    AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
+                    clientMessage.getSenderIp(), clientMessage.getSenderPort(),
                     AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
                     stopJobMessage.getJobName());
             MessageUtil.sendMessage(message);

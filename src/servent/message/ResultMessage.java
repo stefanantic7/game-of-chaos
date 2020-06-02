@@ -16,7 +16,7 @@ public class ResultMessage extends BasicMessage {
     public ResultMessage(String senderIp, int senderPort, String receiverIp, int receiverPort, JobDetails jobDetails, Set<Point> resultPoints, String fractalId) {
         super(MessageType.RESULT, senderIp, senderPort, receiverIp, receiverPort);
         this.jobDetails = jobDetails;
-        this.resultPoints = resultPoints;
+        this.resultPoints = new HashSet<>(resultPoints);
         this.fractalId = fractalId;
     }
 
