@@ -1,4 +1,4 @@
-20:02:14 - Bootstrap server started on port: 2000
+20:42:51 - Bootstrap server started on port: 2000
 Got: 1100
 Got: 1200
 Adding: localhost:1200

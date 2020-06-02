@@ -18,7 +18,7 @@ public class ResultCommand implements CLICommand {
 
     @Override
     public void execute(String args) {
-        if (args == null) {
+        if (args == null || args.equals("")) {
             AppConfig.timestampedErrorPrint("Job name as argument is required");
             return;
         }

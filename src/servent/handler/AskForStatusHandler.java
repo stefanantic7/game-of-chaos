@@ -48,16 +48,16 @@ public class AskForStatusHandler implements MessageHandler {
         fractalIdToPointsCountMap.put(myFractalId, AppConfig.chordState.getJobRunner().getComputedPoints().size());
 
         int lastActiveNodeId = getLastActiveNodeId();
-        if (AppConfig.myServentInfo.getId() != lastActiveNodeId) {
-            AskForStatusMessage message = new AskForStatusMessage(
-                    clientMessage.getSenderIp(), clientMessage.getSenderPort(),
-                    AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
-                    askForStatusMessage.getJobName(), fractalIdToPointsCountMap);
-            MessageUtil.sendMessage(message);
-        } else {
+        if (AppConfig.myServentInfo.getId() == lastActiveNodeId || askForStatusMessage.hasFractalId()) {
             StatusMessage message = new StatusMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     clientMessage.getSenderIp(), clientMessage.getSenderPort(),
+                    askForStatusMessage.getJobName(), fractalIdToPointsCountMap);
+            MessageUtil.sendMessage(message);
+        } else {
+            AskForStatusMessage message = new AskForStatusMessage(
+                    clientMessage.getSenderIp(), clientMessage.getSenderPort(),
+                    AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
                     askForStatusMessage.getJobName(), fractalIdToPointsCountMap);
             MessageUtil.sendMessage(message);
         }
