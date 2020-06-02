@@ -30,21 +30,19 @@ public class WelcomeHandler implements MessageHandler {
 
 	private void handle() {
 		if (clientMessage.getMessageType() != MessageType.WELCOME) {
-			AppConfig.timestampedErrorPrint("Welcome handler got a message that is not WELCOME");
+			AppConfig.timestampedErrorPrint("Handler got a message that is not WELCOME");
 			return;
 		}
 
-		WelcomeMessage welcomeMsg = (WelcomeMessage)clientMessage;
-		AppConfig.myServentInfo.setId(welcomeMsg.getNewId());
-		AppConfig.chordState.init(welcomeMsg);
+		WelcomeMessage welcomeMessage = (WelcomeMessage)clientMessage;
+		AppConfig.myServentInfo.setId(welcomeMessage.getNewId());
+		AppConfig.chordState.init(welcomeMessage);
 
-		Map<Integer, ServentInfo> nodesMap = new HashMap<>(AppConfig.chordState.getAllNodeInfo());
-
-		UpdateMessage um = new UpdateMessage(
+		UpdateMessage updateMessage = new UpdateMessage(
 				AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
 				AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
-				nodesMap);
+				AppConfig.chordState.getAllNodeInfo());
 
-		MessageUtil.sendMessage(um);
+		MessageUtil.sendMessage(updateMessage);
 	}
 }

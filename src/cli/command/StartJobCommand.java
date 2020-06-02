@@ -33,16 +33,14 @@ public class StartJobCommand implements CLICommand {
 
         int serventCount = AppConfig.chordState.getAllNodeInfo().size();
 
-        // compute number of servents needed to execute the job
-        int jobNodesCount = this.calculateNeededNodes(serventCount, job.getInitialPointsCount());
-        AppConfig.timestampedStandardPrint("Active nodes for \"" + job.getName() + "\": " + jobNodesCount);
+        int neededNodes = this.calculateNeededNodes(serventCount, job.getInitialPointsCount());
+        AppConfig.timestampedStandardPrint("Active nodes for \"" + job.getName() + "\": " + neededNodes);
 
-        // compute fractal ids
-        List<String> fractalIds = this.computeFractalIds(jobNodesCount, job.getInitialPointsCount());
+        List<String> fractalIds = this.computeFractalIds(neededNodes, job.getInitialPointsCount());
         AppConfig.timestampedStandardPrint("Fractal IDs for job \"" + job.getName() + "\": " + fractalIds.toString());
 
         List<String> fractalIdsStack = new LinkedList<>(fractalIds);
-        // TODO: all available nodes
+
         for (Map.Entry<Integer, ServentInfo> entry: AppConfig.chordState.getAllNodeInfo().entrySet()) {
             AppConfig.chordState.registerFractalId(fractalIdsStack.remove(0), entry.getKey());
             if (fractalIdsStack.isEmpty()) {
@@ -51,13 +49,11 @@ public class StartJobCommand implements CLICommand {
         }
         AppConfig.timestampedStandardPrint("Fractal id assigned to node: " + AppConfig.chordState.getFractalIdToNodeIdMap());
 
-        // compute initial job division and send messages
         List<Point> jobPoints = job.getPoints();
         double proportion = job.getProportion();
         int pointsCount = job.getInitialPointsCount();
 
-        if (jobNodesCount < pointsCount) {
-            // only one node is executing the job
+        if (neededNodes < pointsCount) {
 //            int executorId = AppConfig.myServentInfo.getId();
 //            ServentInfo executorServent = AppConfig.myServentInfo;
             ServentInfo executorServent = AppConfig.chordState.getAllNodeInfo().get(0);
@@ -70,7 +66,6 @@ public class StartJobCommand implements CLICommand {
             return;
         }
 
-        // split work and send to servents
         for (int i = 0; i < jobPoints.size(); i++) {
             List<Point> regionPoints = new ArrayList<>();
 
@@ -96,10 +91,10 @@ public class StartJobCommand implements CLICommand {
                 }
             }
 
-            // todo: FIX THIS ASAP - send over successor table
+            // TODO: check var names
             int executorId = AppConfig.chordState.getIdForFractalId(partialFractalIds.get(0));
             ServentInfo executorServent = AppConfig.chordState.getAllNodeInfo().get(executorId);
-            // send to one node partialFractalIds, regionPoints and job
+
             StartJobMessage startJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     executorServent.getIpAddress(), executorServent.getListenerPort(),
@@ -171,8 +166,6 @@ public class StartJobCommand implements CLICommand {
     }
 
     private Job createJobByUser(Scanner scanner) {
-        // validation + unique
-
         System.out.println("Enter name of the job:");
         String name = scanner.nextLine();
         while (AppConfig.myServentInfo.findJob(name) != null) {

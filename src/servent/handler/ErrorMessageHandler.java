@@ -28,7 +28,7 @@ public class ErrorMessageHandler implements MessageHandler {
 
     public void handle() {
         if (clientMessage.getMessageType() != MessageType.ERROR) {
-            AppConfig.timestampedErrorPrint("Quit handler got a message that is not ERROR");
+            AppConfig.timestampedErrorPrint("Handler got a message that is not ERROR");
             return;
         }
 

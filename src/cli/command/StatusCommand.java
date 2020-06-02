@@ -34,7 +34,7 @@ public class StatusCommand implements CLICommand {
 
         if (fractalId == null) {
             ServentInfo firstNode = AppConfig.chordState.getAllNodeInfo().get(0);
-            // TODO: skip links
+
             AskForStatusMessage message = new AskForStatusMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     firstNode.getIpAddress(), firstNode.getListenerPort(),
@@ -49,7 +49,6 @@ public class StatusCommand implements CLICommand {
             }
             ServentInfo concreteServent = AppConfig.chordState.getAllNodeInfo().get(serventId);
 
-            // TODO: skip links
             AskForStatusMessage message = new AskForStatusMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     concreteServent.getIpAddress(), concreteServent.getListenerPort(),

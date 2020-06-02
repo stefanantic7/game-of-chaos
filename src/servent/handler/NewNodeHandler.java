@@ -32,7 +32,7 @@ public class NewNodeHandler implements MessageHandler {
 
 	private void handle() {
 		if (clientMessage.getMessageType() != MessageType.NEW_NODE) {
-			AppConfig.timestampedErrorPrint("NEW_NODE handler got something that is not new node message.");
+			AppConfig.timestampedErrorPrint("Handler got a message that is not NEW_NODE");
 			return;
 		}
 
@@ -51,11 +51,11 @@ public class NewNodeHandler implements MessageHandler {
 
 		int newNodeId = AppConfig.myServentInfo.getId() + 1;
 
-		WelcomeMessage wm = new WelcomeMessage(
+		WelcomeMessage welcomeMessage = new WelcomeMessage(
 				AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
 				newNodeIpAddress, newNodePort,
 				newNodeId, firstServentIpAndPort);
-		MessageUtil.sendMessage(wm);
+		MessageUtil.sendMessage(welcomeMessage);
 	}
 
 }

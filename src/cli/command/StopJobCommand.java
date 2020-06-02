@@ -24,7 +24,6 @@ public class StopJobCommand implements CLICommand {
 
 		ServentInfo firstNode = AppConfig.chordState.getAllNodeInfo().get(0);
 
-		// TODO: skip links
 		StopJobMessage message = new StopJobMessage(
 				AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
 				firstNode.getIpAddress(), firstNode.getListenerPort(),

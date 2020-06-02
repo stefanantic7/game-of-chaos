@@ -45,6 +45,7 @@ public class ResultHandler implements MessageHandler {
         double proportion = resultMessage.getJobDetails().getProportion();
 
 
+        // TODO: separate function
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
         WritableRaster writableRaster = image.getRaster();
         int[] rgb = new int[3];

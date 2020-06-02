@@ -29,7 +29,7 @@ public class UpdateHandler implements MessageHandler {
 
 	private void handle() {
 		if (clientMessage.getMessageType() != MessageType.UPDATE) {
-			AppConfig.timestampedErrorPrint("Update message handler got message that is not UPDATE");
+			AppConfig.timestampedErrorPrint("Handler got message that is not UPDATE");
 			return;
 		}
 
@@ -42,11 +42,11 @@ public class UpdateHandler implements MessageHandler {
 
 		if (!clientMessage.getSenderIp().equals(AppConfig.myServentInfo.getIpAddress())
 				|| clientMessage.getSenderPort() != AppConfig.myServentInfo.getListenerPort()) {
-			Message nextUpdate = new UpdateMessage(
+			Message updateNextNodeMessage = new UpdateMessage(
 					clientMessage.getSenderIp(), clientMessage.getSenderPort(),
 					AppConfig.chordState.getNextNodeIp(),  AppConfig.chordState.getNextNodePort(),
 					AppConfig.chordState.getAllNodeInfo());
-			MessageUtil.sendMessage(nextUpdate);
+			MessageUtil.sendMessage(updateNextNodeMessage);
 		}
 	}
 

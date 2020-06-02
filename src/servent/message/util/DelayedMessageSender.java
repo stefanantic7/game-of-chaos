@@ -83,6 +83,7 @@ public class DelayedMessageSender implements Runnable {
 		return -1;
 	}
 
+	// TODO: check
 	public ServentInfo getNextNodeForServentId(int receiverId) {
 		// if it is my successor send directly to it
 		if (isServentMySuccessor(receiverId)) {

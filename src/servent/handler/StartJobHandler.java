@@ -27,9 +27,10 @@ public class StartJobHandler implements MessageHandler {
         }
     }
 
+    // TODO: Check
     private void handle() {
         if (clientMessage.getMessageType() != MessageType.START_JOB) {
-            AppConfig.timestampedErrorPrint("Job execution handler got a message that is not START_JOB");
+            AppConfig.timestampedErrorPrint("Handler got a message that is not START_JOB");
             return;
         }
 
@@ -43,7 +44,7 @@ public class StartJobHandler implements MessageHandler {
         AppConfig.chordState.setFractalIdToNodeIdMap(startJobMessage.getFractalIdToNodeIdMap());
 
         Job job = startJobMessage.getJob();
-        // no further splitting, job execution can start
+
         if (fractalIds.size() == 1) {
             JobRunner jobRunner = new JobRunner(job.getName(), fractalIds.get(0), job.getProportion(),
                     job.getWidth(), job.getHeight(), pointList);
@@ -53,7 +54,6 @@ public class StartJobHandler implements MessageHandler {
             return;
         }
 
-        // split + send to others
         int level = startJobMessage.getLevel() + 1;
         int initialPointsCount = job.getInitialPointsCount();
         double proportion = job.getProportion();
@@ -83,10 +83,10 @@ public class StartJobHandler implements MessageHandler {
                 }
             }
 
-            // todo: FIX THIS ASAP - send over successor table
+            // TODO: check var names
             int executorId = AppConfig.chordState.getFractalIdToNodeIdMap().get(partialFractalIds.get(0));
             ServentInfo executorServent = AppConfig.chordState.getAllNodeInfo().get(executorId);
-            // send to one node partialFractalIds, regionPoints and job
+
             StartJobMessage newStartJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     executorServent.getIpAddress(), executorServent.getListenerPort(),

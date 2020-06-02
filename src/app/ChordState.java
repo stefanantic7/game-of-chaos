@@ -130,7 +130,6 @@ public class ChordState {
 		}
 		successorTable[0] = firstSuccessor;
 
-		//i is successorTable index
 		int successorIndex = 1;
 		for(int i = 1; i < chordLevel; i++) {
 			int id = (AppConfig.myServentInfo.getId() + (int)(Math.pow(2, i))) % allNodeInfo.size();
