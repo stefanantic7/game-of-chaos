@@ -35,8 +35,11 @@ public class AskForStatusHandler implements MessageHandler {
 
         if (AppConfig.chordState.getJobRunner() == null
                 || !AppConfig.chordState.getJobRunner().getJobName().equals(askForStatusMessage.getJobName())) {
-            // TODO: error message
-            AppConfig.timestampedErrorPrint("The job \"" + askForStatusMessage.getJobName() + "\" is not running");
+            BasicMessage errorMessage = new BasicMessage(MessageType.ERROR,
+                    AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
+                    clientMessage.getSenderIp(), clientMessage.getSenderPort(),
+                    "The job \"" + askForStatusMessage.getJobName() + "\" is not running");
+            MessageUtil.sendMessage(errorMessage);
             return;
         }
 

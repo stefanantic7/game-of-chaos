@@ -1,6 +1,7 @@
 package servent.handler;
 
 import app.AppConfig;
+import servent.message.BasicMessage;
 import servent.message.Message;
 import servent.message.MessageType;
 import servent.message.StopJobMessage;
@@ -36,8 +37,11 @@ public class StopJobHandler implements MessageHandler {
 
         if (AppConfig.chordState.getJobRunner() == null
                 || !AppConfig.chordState.getJobRunner().getJobName().equals(stopJobMessage.getJobName())) {
-            // TODO: error message
-            AppConfig.timestampedErrorPrint("The job \"" + stopJobMessage.getJobName() + "\" is not running");
+            BasicMessage errorMessage = new BasicMessage(MessageType.ERROR,
+                    AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
+                    stopJobMessage.getSenderIp(), stopJobMessage.getSenderPort(),
+                    "The job \"" + stopJobMessage.getJobName() + "\" is not running");
+            MessageUtil.sendMessage(errorMessage);
             return;
         }
 
