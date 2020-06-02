@@ -50,6 +50,13 @@ public class SimpleServentListener implements Runnable, Cancellable {
 				//GOT A MESSAGE! <3
 				clientMessage = MessageUtil.readMessage(clientSocket);
 
+				if (!AppConfig.myServentInfo.getIpAddress().equals(clientMessage.getReceiverIp()) ||
+						AppConfig.myServentInfo.getListenerPort() != clientMessage.getReceiverPort()) {
+					AppConfig.timestampedStandardPrint(clientMessage + " is not for me, forward it.");
+					MessageUtil.sendMessage(clientMessage);
+					continue;
+				}
+
 				MessageHandler messageHandler = new NullHandler(clientMessage);
 
 				/*

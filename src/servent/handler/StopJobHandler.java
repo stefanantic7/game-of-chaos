@@ -47,7 +47,7 @@ public class StopJobHandler implements MessageHandler {
         AppConfig.chordState.setJobRunner(null);
         AppConfig.chordState.clearFractalIdToNodeId();
 
-        AppConfig.timestampedStandardPrint("The job \"" + stopJobMessage.getJobName() + "\" has been stopped");
+        AppConfig.timestampedStandardPrint("I stopped job: \"" + stopJobMessage.getJobName() + "\"");
 
         if (AppConfig.myServentInfo.getId() != lastActiveNodeId) {
             StopJobMessage message = new StopJobMessage(
