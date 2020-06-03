@@ -95,6 +95,16 @@ public class QuitHandler implements MessageHandler {
         AppConfig.chordState.getAllNodeInfo().clear();
         AppConfig.chordState.mergeNodesInfoAndUpdateSuccessors(newNodesMap);
 
+        if (AppConfig.chordState.getSuccessorTable().length == 0
+                || AppConfig.chordState.getSuccessorTable()[0] == null) {
+            QuitMessage newQuitMessage = new QuitMessage(
+                    quitMessage.getSenderIp(), quitMessage.getSenderPort(),
+                    AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
+                    quitterId, activeJob, computedPoints);
+            MessageUtil.sendMessage(newQuitMessage);
+            return;
+        }
+
         // Update other notes -> start chain reaction :)
         QuitMessage newQuitMessage = new QuitMessage(
                 quitMessage.getSenderIp(), quitMessage.getSenderPort(),
