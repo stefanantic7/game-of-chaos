@@ -18,11 +18,12 @@ public class JobRunner implements Runnable, Cancellable {
     private final int height;
     private final List<Point> startingPoints;
     private Point lastPoint;
-    private Set<Point> computedPoints;
+    private final Set<Point> computedPoints;
+    private final Job originalJob;
 
     private volatile boolean working;
 
-    public JobRunner(String jobName, String fractalId, double proportion, int width, int height, List<Point> startingPoints) {
+    public JobRunner(Job originalJob, String jobName, String fractalId, double proportion, int width, int height, List<Point> startingPoints) {
         this.jobName = jobName;
         this.fractalId = fractalId;
         this.proportion = proportion;
@@ -31,6 +32,8 @@ public class JobRunner implements Runnable, Cancellable {
         this.startingPoints = startingPoints;
         this.computedPoints = new HashSet<>();
         this.working = true;
+
+        this.originalJob = originalJob;
     }
 
     @Override
@@ -117,14 +120,24 @@ public class JobRunner implements Runnable, Cancellable {
     }
 
     private Point computeNewPoint() {
-        if (computedPoints.isEmpty()) {
+        if (computedPoints.isEmpty() || this.lastPoint == null) {
             return getRandomPoint();
         }
 
         Point lastPoint = this.lastPoint;
         Point randomPoint = getRandomStartPoint();
+        if (lastPoint == null) {
+            System.out.println("last: "+lastPoint);
+        }
+        if (randomPoint == null) {
+            System.out.println("random: "+randomPoint);
+        }
         int newX = (int) (randomPoint.getX() + proportion * (lastPoint.getX() - randomPoint.getX()));
         int newY = (int) (randomPoint.getY() + proportion * (lastPoint.getY() - randomPoint.getY()));
         return new Point(newX, newY);
+    }
+
+    public Job getOriginalJob() {
+        return originalJob;
     }
 }

@@ -7,7 +7,9 @@ import servent.message.StartJobMessage;
 import servent.message.util.MessageUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class StartJobHandler implements MessageHandler {
 
@@ -46,8 +48,22 @@ public class StartJobHandler implements MessageHandler {
         Job job = startJobMessage.getJob();
 
         if (fractalIds.size() == 1) {
-            JobRunner jobRunner = new JobRunner(job.getName(), fractalIds.get(0), job.getProportion(),
+            JobRunner jobRunner = new JobRunner(job, job.getName(), fractalIds.get(0), job.getProportion(),
                     job.getWidth(), job.getHeight(), pointList);
+
+            Set<Point> precomputedPointsForMe = new HashSet<>();
+//            Point.getPointsForPolygon(startJobMessage.getPrecomputedPoints(), pointList);
+            for (Point point: startJobMessage.getPrecomputedPoints()) {
+                if (Boundary.insidePolygon(point, pointList)) {
+                    precomputedPointsForMe.add(point);
+                }
+            }
+            System.out.println("new initial points: "+pointList);
+            System.out.println("trebalo je da dodam: "+startJobMessage.getPrecomputedPoints().size());
+            System.out.println("dodajem jos: "+precomputedPointsForMe.size());
+            jobRunner.getComputedPoints().addAll(precomputedPointsForMe);
+            System.out.println("nakon dodavanja: "+jobRunner.getComputedPoints().size());
+
             AppConfig.chordState.setJobRunner(jobRunner);
             Thread t = new Thread(jobRunner);
             t.start();
@@ -90,7 +106,7 @@ public class StartJobHandler implements MessageHandler {
             StartJobMessage newStartJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     executorServent.getIpAddress(), executorServent.getListenerPort(),
-                    partialFractalIds, regionPoints, job, level, AppConfig.chordState.getFractalIdToNodeIdMap());
+                    partialFractalIds, regionPoints, job, level, AppConfig.chordState.getFractalIdToNodeIdMap(), startJobMessage.getPrecomputedPoints());
             MessageUtil.sendMessage(newStartJobMessage);
         }
 

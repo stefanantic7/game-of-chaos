@@ -1,7 +1,10 @@
 package app;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Point implements Serializable {
 
@@ -44,5 +47,26 @@ public class Point implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
+    }
+
+    public boolean inPolygon(List<Point> polygonPoints)
+    {
+        int i;
+        int j;
+        boolean result = false;
+        for (i = 0, j = polygonPoints.size() - 1; i < polygonPoints.size(); j = i++) {
+            if ((polygonPoints.get(i).getY() > this.getY()) != (polygonPoints.get(j).getY() > this.getY()) &&
+                    (this.getX() < (polygonPoints.get(j).getX() - polygonPoints.get(i).getX()) * (this.getY() - polygonPoints.get(i).getY()) / (polygonPoints.get(j).getY()-polygonPoints.get(i).getY()) + polygonPoints.get(i).getY())) {
+                result = !result;
+            }
+        }
+        return result;
+    }
+
+    public static Set<Point> getPointsForPolygon(Set<Point> allPoints, List<Point> polygon)
+    {
+        return allPoints.stream()
+                .filter(point -> point.inPolygon(polygon))
+                .collect(Collectors.toSet());
     }
 }

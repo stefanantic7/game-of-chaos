@@ -63,7 +63,7 @@ public class ResultHandler implements MessageHandler {
                 BufferedImage.TYPE_3BYTE_BGR);
         newImage.setData(writableRaster);
         try {
-            String fileName = jobName + "_" + proportion;
+            String fileName = System.currentTimeMillis()+jobName + "_" + proportion;
             if (resultMessage.hasFractalId()) {
                 fileName = fileName + "_" + resultMessage.getFractalId();
             }

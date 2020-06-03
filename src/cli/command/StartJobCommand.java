@@ -17,6 +17,7 @@ public class StartJobCommand implements CLICommand {
 
     @Override
     public void execute(String jobName, Scanner scanner) {
+        // TODO: check if command is already running
         if (jobName == null || jobName.equals("")) {
             Job newJob = this.createJobByUser(scanner);
             jobName = newJob.getName();
@@ -31,12 +32,21 @@ public class StartJobCommand implements CLICommand {
 
         AppConfig.timestampedStandardPrint("Starting work for \"" + job.getName() + "\"...");
 
+        startJob(job, new HashSet<>());
+    }
+
+    @Override
+    public void execute(String args) {
+        throw new Error("Wrong method call");
+    }
+
+    public static void startJob(Job job, Set<Point> precomputedPoints) {
         int serventCount = AppConfig.chordState.getAllNodeInfo().size();
 
-        int neededNodes = this.calculateNeededNodes(serventCount, job.getInitialPointsCount());
+        int neededNodes = calculateNeededNodes(serventCount, job.getInitialPointsCount());
         AppConfig.timestampedStandardPrint("Active nodes for \"" + job.getName() + "\": " + neededNodes);
 
-        List<String> fractalIds = this.computeFractalIds(neededNodes, job.getInitialPointsCount());
+        List<String> fractalIds = computeFractalIds(neededNodes, job.getInitialPointsCount());
         AppConfig.timestampedStandardPrint("Fractal IDs for job \"" + job.getName() + "\": " + fractalIds.toString());
 
         List<String> fractalIdsStack = new LinkedList<>(fractalIds);
@@ -61,7 +71,7 @@ public class StartJobCommand implements CLICommand {
             StartJobMessage startJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     executorServent.getIpAddress(), executorServent.getListenerPort(),
-                    fractalIds, jobPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap());
+                    fractalIds, jobPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), precomputedPoints);
             MessageUtil.sendMessage(startJobMessage);
             return;
         }
@@ -98,17 +108,12 @@ public class StartJobCommand implements CLICommand {
             StartJobMessage startJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     executorServent.getIpAddress(), executorServent.getListenerPort(),
-                    partialFractalIds, regionPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap());
+                    partialFractalIds, regionPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), precomputedPoints);
             MessageUtil.sendMessage(startJobMessage);
         }
     }
 
-    @Override
-    public void execute(String args) {
-        throw new Error("Wrong method call");
-    }
-
-    private int calculateNeededNodes(int serventCount, int pointsCount) {
+    private static int calculateNeededNodes(int serventCount, int pointsCount) {
         int i = 1;
 
         int neededNodes = 1;
@@ -124,7 +129,7 @@ public class StartJobCommand implements CLICommand {
     }
 
     // TODO: change
-    private List<String> computeFractalIds(int nodesCount, int pointsCount) {
+    private static List<String> computeFractalIds(int nodesCount, int pointsCount) {
         List<String> fractalIds = new ArrayList<>();
         int length = 0;
         String base = "";

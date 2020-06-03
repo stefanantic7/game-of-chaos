@@ -1,6 +1,8 @@
 package cli.command;
 
 import app.AppConfig;
+import app.Job;
+import app.Point;
 import cli.CLIParser;
 import servent.SimpleServentListener;
 import servent.message.QuitMessage;
@@ -9,6 +11,10 @@ import servent.message.util.MessageUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class QuitCommand implements CLICommand {
 
@@ -31,9 +37,24 @@ public class QuitCommand implements CLICommand {
 
         // 1. Update first neighbour and start chain reaction :)
         if (AppConfig.chordState.hasNextNode()) {
+            Job activeJob = null;
+            if (AppConfig.chordState.getJobRunner() != null) {
+                activeJob = AppConfig.chordState.getJobRunner().getOriginalJob();
+            }
+            Set<Point> computedPoints = new HashSet<>();
+
+            // 1. daj svoje tacke, ako sam ja radio job
+            if (AppConfig.chordState.getJobRunner() != null) {
+                computedPoints.addAll(AppConfig.chordState.getJobRunner().getComputedPoints());
+                // 2. zaustavi posao, TODO: zaustavi posao i inace kad radis quit
+                AppConfig.chordState.getJobRunner().stop();
+                AppConfig.chordState.setJobRunner(null);
+                AppConfig.chordState.clearFractalIdToNodeId();
+            }
+
             QuitMessage quitMessage = new QuitMessage(AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
-                    AppConfig.myServentInfo.getId());
+                    AppConfig.myServentInfo.getId(), activeJob, computedPoints);
             MessageUtil.sendMessage(quitMessage);
         }
 
