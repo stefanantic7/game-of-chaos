@@ -1,8 +1,12 @@
 package servent.message;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import app.AppConfig;
 import app.ChordState;
 
 /**
@@ -26,6 +30,8 @@ public class BasicMessage implements Message {
 	private static AtomicInteger messageCounter = new AtomicInteger(0);
 	private final int messageId;
 
+	private final List<String> route;
+
 	public BasicMessage(MessageType type, String senderIp, int senderPort, String receiverIp, int receiverPort) {
 		this.type = type;
 		this.senderIp = senderIp;
@@ -35,6 +41,8 @@ public class BasicMessage implements Message {
 		this.messageText = "";
 
 		this.messageId = messageCounter.getAndIncrement();
+
+		this.route = new LinkedList<>();
 	}
 
 	public BasicMessage(MessageType type, String senderIp, int senderPort, String receiverIp, int receiverPort, String messageText) {
@@ -46,6 +54,8 @@ public class BasicMessage implements Message {
 		this.messageText = messageText;
 
 		this.messageId = messageCounter.getAndIncrement();
+
+		this.route = new LinkedList<>();
 	}
 
 	@Override
@@ -118,4 +128,18 @@ public class BasicMessage implements Message {
 					getReceiverIp() + "|" + getReceiverPort() + "|" + "]";
 	}
 
+	@Override
+	public void addRoute(String ip, int port) {
+		this.route.add(ip + ":" + port);
+	}
+
+	@Override
+	public List<String> getRoute() {
+		return this.route;
+	}
+
+	@Override
+	public void beforeSending() {
+		this.addRoute(AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort());
+	}
 }

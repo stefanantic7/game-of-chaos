@@ -46,7 +46,7 @@ public class MessageUtil {
 		}
 
 		if (MESSAGE_UTIL_PRINTING) {
-			AppConfig.timestampedStandardPrint("Got message " + clientMessage);
+			AppConfig.timestampedStandardPrint("Got message " + clientMessage + ", Route: " + (clientMessage != null ? clientMessage.getRoute() : null));
 		}
 
 		return clientMessage;

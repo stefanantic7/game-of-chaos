@@ -1,6 +1,7 @@
 package servent.message;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * This is your basic message. It should cover most needs.
@@ -22,6 +23,10 @@ import java.io.Serializable;
  *
  */
 public interface Message extends Serializable {
+
+	void addRoute(String ip, int port);
+
+	List<String> getRoute();
 
 	/**
 	 * Port number on which the sender of this message listens for new messages. Use this to reply.
@@ -55,5 +60,7 @@ public interface Message extends Serializable {
 	 * in the system.
 	 */
 	int getMessageId();
+
+	void beforeSending();
 
 }
