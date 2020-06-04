@@ -19,16 +19,6 @@ public class QuitMessage extends BasicMessage {
 
     public QuitMessage(String senderIp, int senderPort,
                        String receiverIp, int receiverPort,
-                       int quitterId) {
-        super(MessageType.QUIT, senderIp, senderPort, receiverIp, receiverPort);
-        this.quitterId = quitterId;
-
-        this.activeJob = null;
-        this.computedPoints = new HashSet<>();
-    }
-
-    public QuitMessage(String senderIp, int senderPort,
-                       String receiverIp, int receiverPort,
                        int quitterId, Job activeJob, Set<Point> computedPoints) {
         super(MessageType.QUIT, senderIp, senderPort, receiverIp, receiverPort);
         this.quitterId = quitterId;

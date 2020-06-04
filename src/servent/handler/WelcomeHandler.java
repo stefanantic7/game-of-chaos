@@ -9,6 +9,7 @@ import servent.message.WelcomeMessage;
 import servent.message.util.MessageUtil;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class WelcomeHandler implements MessageHandler {
@@ -41,7 +42,7 @@ public class WelcomeHandler implements MessageHandler {
 		UpdateMessage updateMessage = new UpdateMessage(
 				AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
 				AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
-				AppConfig.chordState.getAllNodeInfo());
+				AppConfig.chordState.getAllNodeInfo(), null, new HashSet<>());
 
 		MessageUtil.sendMessage(updateMessage);
 	}
