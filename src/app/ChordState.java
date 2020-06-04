@@ -104,6 +104,9 @@ public class ChordState {
 		return successorTable[0].getIpAddress();
 	}
 
+	/**
+	 * Level je broj suseda za koji vazi da je prvi 2^level manji od broja trenutno aktivnih cvorova.
+	 */
 	private void calculateChordLevel() {
 		this.chordLevel = 1;
 		int tmp = allNodeInfo.size();

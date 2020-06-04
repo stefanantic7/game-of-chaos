@@ -1,6 +1,7 @@
 package servent.handler;
 
 import app.*;
+import cli.command.StartJobCommand;
 import servent.message.Message;
 import servent.message.MessageType;
 import servent.message.StartJobMessage;
@@ -51,13 +52,14 @@ public class StartJobHandler implements MessageHandler {
             JobRunner jobRunner = new JobRunner(job, job.getName(), fractalIds.get(0), job.getProportion(),
                     job.getWidth(), job.getHeight(), pointList);
 
-            Set<Point> precomputedPointsForMe = new HashSet<>();
-//            Point.getPointsForPolygon(startJobMessage.getPrecomputedPoints(), pointList);
-            for (Point point: startJobMessage.getPrecomputedPoints()) {
-                if (Boundary.insidePolygon(point, pointList)) {
-                    precomputedPointsForMe.add(point);
-                }
-            }
+            Set<Point> precomputedPointsForMe = new HashSet<>(startJobMessage.getPrecomputedPoints());
+//            Set<Point> precomputedPointsForMe = new HashSet<>();
+//            for (Point point: startJobMessage.getPrecomputedPoints()) {
+//                if (Boundary.insidePolygon(point, pointList)) {
+//                    precomputedPointsForMe.add(point);
+//                }
+//            }
+
             System.out.println("new initial points: "+pointList);
             System.out.println("trebalo je da dodam: "+startJobMessage.getPrecomputedPoints().size());
             System.out.println("dodajem jos: "+precomputedPointsForMe.size());
@@ -92,9 +94,14 @@ public class StartJobHandler implements MessageHandler {
                 regionPoints.add(newPoint);
             }
 
+            // Svi koji imaju isti nivo ce se proslediti dalje
             List<String> partialFractalIds = new ArrayList<>();
             for (String fractal: fractalIds) {
+                // gledam da li je drugi karakter (za level 1) isti kao i
+                // todo: starts with
+
                 if (fractal.charAt(level) - '0' == i) {
+//                if (fractal.startsWith(fractal.substring(0,level) + i)) {
                     partialFractalIds.add(fractal);
                 }
             }
@@ -106,7 +113,7 @@ public class StartJobHandler implements MessageHandler {
             StartJobMessage newStartJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     executorServent.getIpAddress(), executorServent.getListenerPort(),
-                    partialFractalIds, regionPoints, job, level, AppConfig.chordState.getFractalIdToNodeIdMap(), startJobMessage.getPrecomputedPoints());
+                    partialFractalIds, regionPoints, job, level, AppConfig.chordState.getFractalIdToNodeIdMap(), Boundary.takePoints(startJobMessage.getPrecomputedPoints(), regionPoints, proportion));
             MessageUtil.sendMessage(newStartJobMessage);
         }
 

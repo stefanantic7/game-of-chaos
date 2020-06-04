@@ -1,9 +1,6 @@
 package cli.command;
 
-import app.AppConfig;
-import app.Job;
-import app.Point;
-import app.ServentInfo;
+import app.*;
 import servent.message.StartJobMessage;
 import servent.message.util.MessageUtil;
 
@@ -71,7 +68,7 @@ public class StartJobCommand implements CLICommand {
             StartJobMessage startJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     executorServent.getIpAddress(), executorServent.getListenerPort(),
-                    fractalIds, jobPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), precomputedPoints);
+                    fractalIds, jobPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), Boundary.takePoints(precomputedPoints, jobPoints, job.getProportion()));
             MessageUtil.sendMessage(startJobMessage);
             return;
         }
@@ -108,7 +105,7 @@ public class StartJobCommand implements CLICommand {
             StartJobMessage startJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
                     executorServent.getIpAddress(), executorServent.getListenerPort(),
-                    partialFractalIds, regionPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), precomputedPoints);
+                    partialFractalIds, regionPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), Boundary.takePoints(precomputedPoints, regionPoints, job.getProportion()));
             MessageUtil.sendMessage(startJobMessage);
         }
     }

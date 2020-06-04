@@ -51,32 +51,6 @@ public class JobRunner implements Runnable, Cancellable {
         }
     }
 
-    private void saveImage() {
-        Set<Point> resultPoints = this.computedPoints;
-        String jobName = this.jobName;
-        int width = this.width;
-        int height = this.height;
-        double proportion = this.proportion;
-
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-
-        WritableRaster writableRaster = image.getRaster();
-        int[] rgb = new int[3];
-        rgb[0] = 255;
-        rgb[1] = 255;
-        rgb[2] = 255;
-        for (Point p : resultPoints) {
-            writableRaster.setPixel(p.getX(), p.getY(), rgb);
-        }
-        BufferedImage newImage = new BufferedImage(writableRaster.getWidth(), writableRaster.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-        newImage.setData(writableRaster);
-        try {
-            ImageIO.write(newImage, "PNG", new File("fractals/" + jobName + "_" + proportion + ".png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void stop() {
         this.working = false;
@@ -126,12 +100,6 @@ public class JobRunner implements Runnable, Cancellable {
 
         Point lastPoint = this.lastPoint;
         Point randomPoint = getRandomStartPoint();
-        if (lastPoint == null) {
-            System.out.println("last: "+lastPoint);
-        }
-        if (randomPoint == null) {
-            System.out.println("random: "+randomPoint);
-        }
         int newX = (int) (randomPoint.getX() + proportion * (lastPoint.getX() - randomPoint.getX()));
         int newY = (int) (randomPoint.getY() + proportion * (lastPoint.getY() - randomPoint.getY()));
         return new Point(newX, newY);
