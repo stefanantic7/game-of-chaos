@@ -44,17 +44,16 @@ public class ResultCommand implements CLICommand {
             MessageUtil.sendMessage(askForResultMessage);
         }
         else {
-            // TODO: check name
-            Integer executorId = AppConfig.chordState.getIdForFractalId(fractalId);
-            if (executorId == null) {
+            Integer runnerId = AppConfig.chordState.getIdForFractalId(fractalId);
+            if (runnerId == null) {
                 AppConfig.timestampedErrorPrint("Fractal id " + fractalId + " does not exists");
                 return;
             }
-            ServentInfo executorServent = AppConfig.chordState.getAllNodeInfo().get(executorId);
+            ServentInfo serventRunner = AppConfig.chordState.getAllNodeInfo().get(runnerId);
 
             AskForResultMessage askForResultMessage = new AskForResultMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
-                    executorServent.getIpAddress(), executorServent.getListenerPort(), jobName, fractalId);
+                    serventRunner.getIpAddress(), serventRunner.getListenerPort(), jobName, fractalId);
             MessageUtil.sendMessage(askForResultMessage);
         }
     }

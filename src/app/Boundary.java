@@ -41,11 +41,10 @@ public class Boundary {
         return myPoints;
     }
 
-    private static Set<Point> takeRandomPoints(Set<Point> points, int divideForServents) {
+    private static Set<Point> takeRandomPoints(Set<Point> points, int allPointsCount, int divideForServents) {
         Set<Point> myPoints = new HashSet<>();
 
-        System.out.println("delim na: "+divideForServents);
-        int pointsCount = Math.min(points.size(), points.size()/divideForServents);
+        int pointsCount = Math.min(allPointsCount, allPointsCount/divideForServents);
         for (Point point : new HashSet<>(points)) {
             myPoints.add(point);
             points.remove(point);
@@ -57,12 +56,12 @@ public class Boundary {
         return myPoints;
     }
 
-    public static Set<Point> takePoints(Set<Point> points, List<Point> polygonPoints, double proportion) {
+    public static Set<Point> takePoints(Set<Point> points, int allPointsCount, List<Point> polygonPoints, double proportion) {
         if (proportion > 0.5) {
             if (AppConfig.chordState.getAllNodeInfo().size() < polygonPoints.size()) {
-                return takeRandomPoints(points, 1);
+                return takeRandomPoints(points, allPointsCount, 1);
             }
-            return takeRandomPoints(points, polygonPoints.size());
+            return takeRandomPoints(points, allPointsCount, polygonPoints.size());
         }
 
         return takePointsInPolygon(points, polygonPoints);

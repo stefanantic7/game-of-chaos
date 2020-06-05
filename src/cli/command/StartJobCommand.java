@@ -39,6 +39,8 @@ public class StartJobCommand implements CLICommand {
 
     public static void startJob(Job job, Set<Point> precomputedPoints) {
         int serventCount = AppConfig.chordState.getAllNodeInfo().size();
+        // WARNING: this should be on the top(here) because we will remove elements of the precomputedPoints set
+        int precomputedPointsCount = precomputedPoints.size();
 
         int neededNodes = calculateNeededNodes(serventCount, job.getInitialPointsCount());
         AppConfig.timestampedStandardPrint("Active nodes for \"" + job.getName() + "\": " + neededNodes);
@@ -61,14 +63,12 @@ public class StartJobCommand implements CLICommand {
         int pointsCount = job.getInitialPointsCount();
 
         if (neededNodes < pointsCount) {
-//            int executorId = AppConfig.myServentInfo.getId();
-//            ServentInfo executorServent = AppConfig.myServentInfo;
-            ServentInfo executorServent = AppConfig.chordState.getAllNodeInfo().get(0);
+            ServentInfo serventRunner = AppConfig.chordState.getAllNodeInfo().get(0);
 
             StartJobMessage startJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
-                    executorServent.getIpAddress(), executorServent.getListenerPort(),
-                    fractalIds, jobPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), Boundary.takePoints(precomputedPoints, jobPoints, job.getProportion()));
+                    serventRunner.getIpAddress(), serventRunner.getListenerPort(),
+                    fractalIds, jobPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), precomputedPoints);
             MessageUtil.sendMessage(startJobMessage);
             return;
         }
@@ -98,14 +98,17 @@ public class StartJobCommand implements CLICommand {
                 }
             }
 
-            // TODO: check var names
-            int executorId = AppConfig.chordState.getIdForFractalId(partialFractalIds.get(0));
-            ServentInfo executorServent = AppConfig.chordState.getAllNodeInfo().get(executorId);
+            int runnerId = AppConfig.chordState.getIdForFractalId(partialFractalIds.get(0));
+            ServentInfo serventRunner = AppConfig.chordState.getAllNodeInfo().get(runnerId);
+
+            Set<Point> forwardedPoints = Boundary.takePoints(
+                    precomputedPoints, precomputedPointsCount,
+                    regionPoints, job.getProportion());
 
             StartJobMessage startJobMessage = new StartJobMessage(
                     AppConfig.myServentInfo.getIpAddress(), AppConfig.myServentInfo.getListenerPort(),
-                    executorServent.getIpAddress(), executorServent.getListenerPort(),
-                    partialFractalIds, regionPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), Boundary.takePoints(precomputedPoints, regionPoints, job.getProportion()));
+                    serventRunner.getIpAddress(), serventRunner.getListenerPort(),
+                    partialFractalIds, regionPoints, job, 0, AppConfig.chordState.getFractalIdToNodeIdMap(), forwardedPoints);
             MessageUtil.sendMessage(startJobMessage);
         }
     }
@@ -177,7 +180,7 @@ public class StartJobCommand implements CLICommand {
         }
 
         System.out.println("Enter coordinates (example: `(200,500);(500,200);(500,700)`):");
-        String[] pointsCoordinates = scanner.nextLine().split(";"); // TODO: validate with regex
+        String[] pointsCoordinates = scanner.nextLine().split(";");
 
 
         double proportion = 0;
