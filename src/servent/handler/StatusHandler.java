@@ -34,7 +34,9 @@ public class StatusHandler implements MessageHandler {
         output.append("Active nodes: ").append(statusMessage.getFractalIdToPointCountMap().size()).append("\n");
         int totalPoints = 0;
         for (Map.Entry<String, Integer> entry: statusMessage.getFractalIdToPointCountMap().entrySet()) {
-            output.append("Fractal id ").append(entry.getKey()).append(": ").append(entry.getValue()).append(" points\n");
+            output.append("Fractal id ").append(entry.getKey())
+                    .append(", servent id ").append(AppConfig.chordState.getFractalIdToNodeIdMap().get(entry.getKey()))
+                    .append(": ").append(entry.getValue()).append(" points\n");
             totalPoints += entry.getValue();
         }
         output.append("Total points: ").append(totalPoints);

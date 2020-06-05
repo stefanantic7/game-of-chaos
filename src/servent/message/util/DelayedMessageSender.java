@@ -88,7 +88,6 @@ public class DelayedMessageSender implements Runnable {
 
 	// TODO: check
 	public ServentInfo getNextNodeForServentId(int receiverId) {
-		// if it is my successor send directly to it
 		if (isServentMySuccessor(receiverId)) {
 			return AppConfig.chordState.getAllNodeInfo().get(receiverId);
 		}
@@ -113,7 +112,6 @@ public class DelayedMessageSender implements Runnable {
 		return successorTable[0];
 	}
 
-	// returns true if we can send message directly to servent
 	private boolean isServentMySuccessor(int serventId) {
 		for (ServentInfo successor: AppConfig.chordState.getSuccessorTable()) {
 			if (successor.getId() == serventId) {
