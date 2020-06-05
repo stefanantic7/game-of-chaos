@@ -14,7 +14,6 @@ public class StartJobCommand implements CLICommand {
 
     @Override
     public void execute(String jobName, Scanner scanner) {
-        // TODO: check if command is already running
         if (jobName == null || jobName.equals("")) {
             Job newJob = this.createJobByUser(scanner);
             jobName = newJob.getName();

@@ -93,10 +93,8 @@ public class StartJobHandler implements MessageHandler {
             List<String> partialFractalIds = new ArrayList<>();
             for (String fractal: fractalIds) {
                 // gledam da li je drugi karakter (za level 1) isti kao i
-                // todo: starts with
 
-                if (fractal.charAt(level) - '0' == i) {
-//                if (fractal.startsWith(fractal.substring(0,level) + i)) {
+                if (fractal.startsWith(fractal.substring(0,level) + i)) {
                     partialFractalIds.add(fractal);
                 }
             }
