@@ -127,46 +127,30 @@ public class StartJobCommand implements CLICommand {
         return neededNodes;
     }
 
-    // TODO: change
+
     private static List<String> computeFractalIds(int nodesCount, int pointsCount) {
         List<String> fractalIds = new ArrayList<>();
-        int length = 0;
-        String base = "";
-
-        if (nodesCount == 1) {
+        if (nodesCount < pointsCount) {
             fractalIds.add("0");
             return fractalIds;
         }
 
-        while (nodesCount > 0) {
-            if (length >= 1) {
-                boolean hasLength = false;
-                for (String fractalId: fractalIds) {
-                    if (fractalId.length() == length) {
-                        base = fractalId;
-                        fractalIds.remove(fractalId);
-                        hasLength = true;
-                        break;
-                    }
-                }
-                if (!hasLength) {
-                    length++;
-                    continue;
-                }
-
-                nodesCount++;
-            }
-
-            for (int i = 0; i < pointsCount; i++) {
-                fractalIds.add(base + i);
-            }
-            if (length == 0) {
-                length++;
-            }
-            nodesCount -= pointsCount;
+        while (fractalIds.size() < nodesCount) {
+            addNewLevelOfFractalIds(fractalIds, pointsCount);
         }
-        Collections.sort(fractalIds);
         return fractalIds;
+    }
+
+    private static void addNewLevelOfFractalIds(List<String> fractalIds, int numberOfPoints) {
+        String base = "";
+        if (fractalIds.size() > 0) {
+            base = fractalIds.remove(0);
+        }
+
+        for (int id = 0; id < numberOfPoints; id++) {
+            String newFractalId = base+id;
+            fractalIds.add(newFractalId);
+        }
     }
 
     private Job createJobByUser(Scanner scanner) {

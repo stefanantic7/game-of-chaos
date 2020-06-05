@@ -46,7 +46,7 @@ public class QuitCommand implements CLICommand {
             // 1. daj svoje tacke, ako sam ja radio job
             if (AppConfig.chordState.getJobRunner() != null) {
                 computedPoints.addAll(AppConfig.chordState.getJobRunner().getComputedPoints());
-                // 2. zaustavi posao, TODO: zaustavi posao i inace kad radis quit
+                // 2. zaustavi posao
                 AppConfig.chordState.getJobRunner().stop();
                 AppConfig.chordState.setJobRunner(null);
                 AppConfig.chordState.clearFractalIdToNodeId();
@@ -56,6 +56,11 @@ public class QuitCommand implements CLICommand {
                     AppConfig.chordState.getNextNodeIp(), AppConfig.chordState.getNextNodePort(),
                     AppConfig.myServentInfo.getId(), activeJob, computedPoints);
             MessageUtil.sendMessage(quitMessage);
+        }
+
+        if (AppConfig.chordState.getJobRunner() != null) {
+            // samo stopiraj runnera, protiv uroka :)
+            AppConfig.chordState.getJobRunner().stop();
         }
 
         // 2. Notify bootstrap server

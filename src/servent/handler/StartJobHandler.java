@@ -30,7 +30,6 @@ public class StartJobHandler implements MessageHandler {
         }
     }
 
-    // TODO: Check
     private void handle() {
         if (clientMessage.getMessageType() != MessageType.START_JOB) {
             AppConfig.timestampedErrorPrint("Handler got a message that is not START_JOB");

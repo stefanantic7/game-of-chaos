@@ -86,9 +86,8 @@ public class DelayedMessageSender implements Runnable {
 		return -1;
 	}
 
-	// TODO: check
 	public ServentInfo getNextNodeForServentId(int receiverId) {
-		if (isServentMySuccessor(receiverId)) {
+		if (isMySuccessor(receiverId)) {
 			return AppConfig.chordState.getAllNodeInfo().get(receiverId);
 		}
 		ServentInfo[] successorTable = AppConfig.chordState.getSuccessorTable();
@@ -96,14 +95,14 @@ public class DelayedMessageSender implements Runnable {
 		int leftId = successorTable[0].getId();
 		for (int i = 1; i < successorTable.length; i++) {
 			int rightId = successorTable[i].getId();
-			if (isBetweenNodes(leftId, rightId, receiverId)) {
+			if (isNodeBetween(leftId, rightId, receiverId)) {
 				AppConfig.timestampedStandardPrint("I do not know about receiver "+receiverId+" but will send to "+successorTable[i-1]);
 				return successorTable[i-1];
 			}
 			leftId = rightId;
 		}
 
-		if (isBetweenNodes(leftId, successorTable[0].getId(), receiverId)) {
+		if (isNodeBetween(leftId, successorTable[0].getId(), receiverId)) {
 			AppConfig.timestampedStandardPrint("I do not know about receiver "+receiverId+" but will send to "+successorTable[successorTable.length - 1]);
 			return successorTable[successorTable.length - 1];
 		}
@@ -112,7 +111,7 @@ public class DelayedMessageSender implements Runnable {
 		return successorTable[0];
 	}
 
-	private boolean isServentMySuccessor(int serventId) {
+	private boolean isMySuccessor(int serventId) {
 		for (ServentInfo successor: AppConfig.chordState.getSuccessorTable()) {
 			if (successor.getId() == serventId) {
 				return true;
@@ -121,7 +120,7 @@ public class DelayedMessageSender implements Runnable {
 		return false;
 	}
 
-	private boolean isBetweenNodes(int left, int right, int target) {
+	private boolean isNodeBetween(int left, int right, int target) {
 		int temp = target;
 		while (true) {
 			temp = (temp + 1) % AppConfig.chordState.getAllNodeInfo().size();
