@@ -1,11 +1,9 @@
 package servent.handler;
 
 import app.AppConfig;
-import servent.message.AskForStatusMessage;
 import servent.message.Message;
 import servent.message.MessageType;
 import servent.message.StatusMessage;
-import servent.message.util.MessageUtil;
 
 import java.util.Map;
 
@@ -26,7 +24,7 @@ public class StatusHandler implements MessageHandler {
     }
 
     private void handle() {
-        if (clientMessage.getMessageType() != MessageType.STATUS_MESSAGE) {
+        if (clientMessage.getMessageType() != MessageType.STATUS) {
             AppConfig.timestampedErrorPrint("Handler got a message that is not STATUS_MESSAGE");
             return;
         }

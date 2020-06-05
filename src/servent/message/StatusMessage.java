@@ -9,7 +9,7 @@ public class StatusMessage extends BasicMessage {
     private final Map<String, Integer> fractalIdToPointCountMap;
 
     public StatusMessage(String senderIp, int senderPort, String receiverIp, int receiverPort, String jobName, Map<String, Integer> fractalIdToPointCountMap) {
-        super(MessageType.STATUS_MESSAGE, senderIp, senderPort, receiverIp, receiverPort);
+        super(MessageType.STATUS, senderIp, senderPort, receiverIp, receiverPort);
         this.jobName = jobName;
         this.fractalIdToPointCountMap = fractalIdToPointCountMap;
     }

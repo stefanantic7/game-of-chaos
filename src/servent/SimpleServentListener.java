@@ -92,7 +92,7 @@ public class SimpleServentListener implements Runnable, Cancellable {
 				case ASK_FOR_STATUS:
 					messageHandler = new AskForStatusHandler(clientMessage);
 					break;
-				case STATUS_MESSAGE:
+				case STATUS:
 					messageHandler = new StatusHandler(clientMessage);
 					break;
 				case ERROR:
